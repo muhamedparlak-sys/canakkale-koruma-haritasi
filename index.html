@@ -85,7 +85,7 @@ const paneSira = g => ust.includes(g) ? 410 : g.startsWith("Sitler") ? 420 : g =
 KATMANLAR.forEach((k, i) => {
   const pn = "p" + paneSira(k.grup);
   if (!map.getPane(pn)) { map.createPane(pn).style.zIndex = paneSira(k.grup); }
-  const st = { pane: pn, color: k.renk, weight: k.cizgi ? 2.2 : 1, opacity: .95, fillColor: k.renk, fillOpacity: k.cizgi ? 0 : (ust.includes(k.grup) ? .12 : .35), dashArray: k.kesik ? "6 5" : null };
+  const st = { pane: pn, color: k.renk, weight: k.grup === "Kıyı" ? 3.5 : k.cizgi ? 2.2 : 1, opacity: .95, fillColor: k.renk, fillOpacity: k.cizgi ? 0 : (ust.includes(k.grup) ? .12 : .35), dashArray: k.kesik ? "6 5" : null };
   const lyr = L.geoJSON(k.veri, {
     pane: pn, style: () => st,
     pointToLayer: (f, ll) => L.circleMarker(ll, { pane: pn, radius: k.grup === "Proje" ? 7 : 5, color: "#222", weight: 1, fillColor: k.renk, fillOpacity: .95 }),
