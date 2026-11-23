@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Çanakkale Koruma Haritası</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root { --bg:#f6f4ef; --ink:#1d1d1b; --mute:#6b675f; --line:#d9d4c7; --panel:#fffdf8; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; font:14px/1.35 system-ui, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
+  #map { position:absolute; inset:0 0 0 340px; }
+  #panel { position:absolute; top:0; left:0; bottom:0; width:340px; overflow:auto; background:var(--panel); border-right:1px solid var(--line); padding:14px 14px 40px; }
+  h1 { font-size:17px; margin:0 0 4px; }
+  .alt { color:var(--mute); font-size:12px; margin-bottom:10px; }
+  #ara { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; font:inherit; margin-bottom:6px; }
+  #sonuc { max-height:180px; overflow:auto; font-size:12.5px; }
+  #sonuc div { padding:4px 6px; cursor:pointer; border-bottom:1px solid #eee; }
+  #sonuc div:hover { background:#f1ede2; }
+  .grup { margin-top:12px; border-top:1px solid var(--line); padding-top:8px; }
+  .grup > label { font-weight:600; display:flex; gap:6px; align-items:center; }
+  .kat { display:flex; gap:7px; align-items:center; padding:3px 0 3px 18px; font-size:13px; }
+  .kat span.n { color:var(--mute); font-size:11.5px; margin-left:auto; }
+  .sw { width:14px; height:14px; border-radius:3px; flex:none; border:1px solid rgba(0,0,0,.35); }
+  .sw.cz { height:4px; border:none; }
+  .sw.kz { height:0; border-top:3px dashed; background:none !important; }
+  .altlik { margin-top:10px; font-size:13px; display:flex; gap:12px; }
+  .leaflet-popup-content { font-size:12.5px; max-height:260px; overflow:auto; }
+  .leaflet-popup-content b { display:block; margin-bottom:4px; font-size:13.5px; }
+  .leaflet-popup-content td { padding:1px 6px 1px 0; vertical-align:top; }
+  .leaflet-popup-content td:first-child { color:var(--mute); white-space:nowrap; }
+  #ac { display:none; }
+  @media (max-width: 760px) {
+    #panel { width:100%; bottom:auto; height:46%; border-right:none; border-bottom:1px solid var(--line); padding:12px 16px 30px; }
+    #map { inset:46% 0 0 0; }
+  }
+</style>
+</head>
+<body>
+<aside id="panel">
+  <h1>Çanakkale koruma haritası</h1>
+  <div class="alt">Tescilli yapılar, sitler, üst koruma statüleri, kıyı ve idari sınırlar. Bir öğeye tıklayınca kaydı açılır.</div>
+  <input id="ara" type="search" placeholder="Ada göre ara (ör. Abydos, Nara, şehitlik)">
+  <div id="sonuc"></div>
+  <div class="altlik">
+    <label><input type="radio" name="alt" value="osm" checked> Harita</label>
+    <label><input type="radio" name="alt" value="uydu"> Uydu</label>
+  </div>
+  <div id="liste"></div>
+</aside>
+<div id="map"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="data.js"></script>
+<script>
+const map = L.map("map", { preferCanvas: true }).setView([40.08, 26.33], 10);
+const alt = {
+  osm: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }),
+  uydu: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Esri" })
+};
+alt.osm.addTo(map);
+document.querySelectorAll("input[name=alt]").forEach(r => r.onchange = () => {
+  Object.values(alt).forEach(t => map.removeLayer(t)); alt[r.value].addTo(map).bringToBack();
+});
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function popup(k, p) {
+  const ad = p.ad || p.label_text || p.name || p.ADI || p.mahalle || k.ad;
+  const satir = Object.entries(p).filter(([a]) => a !== "ad").map(([a, v]) => `<tr><td>${esc(a)}</td><td>${esc(v)}</td></tr>`).join("");
+  return `<b>${esc(ad)}</b><div style="color:#6b675f;margin-bottom:4px">${esc(k.grup)} · ${esc(k.ad)}</div><table>${satir}</table>`;
+}
+
+const katman = [], aranan = [];
+const sira = [...new Set(KATMANLAR.map(k => k.grup))];
+const liste = document.getElementById("liste");
+const ust = ["Üst koruma", "İdari sınırlar"];  // geniş alanlar altta çizilsin
+const paneSira = g => ust.includes(g) ? 410 : g.startsWith("Sitler") ? 420 : g === "Kıyı" ? 440 : g === "Proje" ? 450 : 430;
+
+KATMANLAR.forEach((k, i) => {
+  const pn = "p" + paneSira(k.grup);
+  if (!map.getPane(pn)) { map.createPane(pn).style.zIndex = paneSira(k.grup); }
+  const st = { pane: pn, color: k.renk, weight: k.cizgi ? 2.2 : 1, opacity: .95, fillColor: k.renk, fillOpacity: k.cizgi ? 0 : (ust.includes(k.grup) ? .12 : .35), dashArray: k.kesik ? "6 5" : null };
+  const lyr = L.geoJSON(k.veri, {
+    pane: pn, style: () => st,
+    pointToLayer: (f, ll) => L.circleMarker(ll, { pane: pn, radius: k.grup === "Proje" ? 7 : 5, color: "#222", weight: 1, fillColor: k.renk, fillOpacity: .95 }),
+    onEachFeature: (f, l) => {
+      l.bindPopup(() => popup(k, f.properties || {}));
+      const p = f.properties || {}; const ad = p.ad || p.label_text || p.name || "";
+      if (ad) aranan.push({ ad: String(ad), alt: k.ad, l });
+    }
+  });
+  katman[i] = lyr; if (k.acik) lyr.addTo(map);
+});
+
+sira.forEach(g => {
+  const d = document.createElement("div"); d.className = "grup";
+  const idx = KATMANLAR.map((k, i) => [k, i]).filter(([k]) => k.grup === g);
+  d.innerHTML = `<label><input type="checkbox" class="gc"> ${esc(g)}</label>` + idx.map(([k, i]) => {
+    const cls = k.kesik ? "sw kz" : k.cizgi ? "sw cz" : "sw";
+    const stl = k.kesik ? `border-top-color:${k.renk}` : `background:${k.renk}`;
+    return `<label class="kat"><input type="checkbox" data-i="${i}" ${k.acik ? "checked" : ""}><span class="${cls}" style="${stl}"></span>${esc(k.ad)}<span class="n">${k.veri.features.length}</span></label>`;
+  }).join("");
+  liste.appendChild(d);
+  const gc = d.querySelector(".gc"), kc = [...d.querySelectorAll("input[data-i]")];
+  const sync = () => { gc.checked = kc.every(c => c.checked); gc.indeterminate = !gc.checked && kc.some(c => c.checked); };
+  kc.forEach(c => c.onchange = () => { const l = katman[c.dataset.i]; c.checked ? l.addTo(map) : map.removeLayer(l); sync(); });
+  gc.onchange = () => { kc.forEach(c => { c.checked = gc.checked; c.onchange(); }); };
+  sync();
+});
+
+const sonuc = document.getElementById("sonuc");
+document.getElementById("ara").oninput = e => {
+  const q = e.target.value.toLocaleLowerCase("tr").trim(); sonuc.innerHTML = "";
+  if (q.length < 2) return;
+  aranan.filter(a => a.ad.toLocaleLowerCase("tr").includes(q)).slice(0, 40).forEach(a => {
+    const d = document.createElement("div"); d.innerHTML = `${esc(a.ad)} <span style="color:#6b675f">· ${esc(a.alt)}</span>`;
+    d.onclick = () => {
+      const i = katman.findIndex(l => l.hasLayer(a.l));
+      if (i >= 0 && !map.hasLayer(katman[i])) { katman[i].addTo(map); const c = document.querySelector(`input[data-i="${i}"]`); if (c) { c.checked = true; c.dispatchEvent(new Event("change")); } }
+      a.l.getBounds ? map.fitBounds(a.l.getBounds(), { maxZoom: 16 }) : map.setView(a.l.getLatLng(), 16);
+      a.l.openPopup();
+    };
+    sonuc.appendChild(d);
+  });
+  (window.KONUMSUZ || []).filter(r => r.ad.toLocaleLowerCase("tr").includes(q)).slice(0, 25).forEach(r => {
+    const d = document.createElement("div");
+    d.innerHTML = `${esc(r.ad)} <span style="color:#a0522d">· konumu yok</span>`;
+    d.onclick = () => {
+      const satir = Object.entries(r).filter(([a]) => a !== "ad").map(([a, v]) => `<tr><td>${esc(a)}</td><td>${esc(v)}</td></tr>`).join("");
+      L.popup({ maxWidth: 320 }).setLatLng(map.getCenter())
+        .setContent(`<b>${esc(r.ad)}</b><div style="color:#a0522d;margin-bottom:4px">2023 envanteri · haritada konumu yok</div><table>${satir}</table>`).openOn(map);
+    };
+    sonuc.appendChild(d);
+  });
+};
+setTimeout(() => map.invalidateSize(), 200);
+</script>
+</body>
+</html>
