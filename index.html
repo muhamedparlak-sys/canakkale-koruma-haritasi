@@ -29,7 +29,11 @@
   .leaflet-popup-content b { display:block; margin-bottom:4px; font-size:13.5px; }
   .leaflet-popup-content td { padding:1px 6px 1px 0; vertical-align:top; }
   .leaflet-popup-content td:first-child { color:var(--mute); white-space:nowrap; }
-  #ac { display:none; }
+  .etk { color:#fff; font-size:11.5px; font-weight:600; white-space:nowrap; transform:translate(-50%,-50%); pointer-events:none;
+         text-shadow:0 0 3px #000, 0 0 3px #000, 0 0 2px #000; }
+  .etk.buyuk { font-size:13.5px; color:#ffeb3b; }
+  body.acik .etk { color:#1d1d1b; text-shadow:0 0 3px #fff, 0 0 3px #fff, 0 0 2px #fff; }
+  body.acik .etk.buyuk { color:#b71c1c; }
   @media (max-width: 760px) {
     #panel { width:100%; bottom:auto; height:46%; border-right:none; border-bottom:1px solid var(--line); padding:12px 16px 30px; }
     #map { inset:46% 0 0 0; }
@@ -43,8 +47,8 @@
   <input id="ara" type="search" placeholder="Ada göre ara (ör. Abydos, Nara, şehitlik)">
   <div id="sonuc"></div>
   <div class="altlik">
-    <label><input type="radio" name="alt" value="osm" checked> Harita</label>
-    <label><input type="radio" name="alt" value="uydu"> Uydu</label>
+    <label><input type="radio" name="alt" value="uydu" checked> Uydu (yer adlı)</label>
+    <label><input type="radio" name="alt" value="osm"> Harita</label>
   </div>
   <div id="liste"></div>
 </aside>
@@ -53,13 +57,16 @@
 <script src="data.js"></script>
 <script>
 const map = L.map("map", { preferCanvas: true }).setView([40.08, 26.33], 10);
+const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/";
+const yerAdi = L.tileLayer(ESRI + "Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, pane: "overlayPane" });
 const alt = {
   osm: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }),
-  uydu: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Esri" })
+  uydu: L.layerGroup([L.tileLayer(ESRI + "World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Esri, Maxar" }), yerAdi])
 };
-alt.osm.addTo(map);
+alt.uydu.addTo(map);
 document.querySelectorAll("input[name=alt]").forEach(r => r.onchange = () => {
-  Object.values(alt).forEach(t => map.removeLayer(t)); alt[r.value].addTo(map).bringToBack();
+  Object.values(alt).forEach(t => map.removeLayer(t)); alt[r.value].addTo(map);
+  document.body.classList.toggle("acik", r.value === "osm");
 });
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -69,7 +76,7 @@ function popup(k, p) {
   return `<b>${esc(ad)}</b><div style="color:#6b675f;margin-bottom:4px">${esc(k.grup)} · ${esc(k.ad)}</div><table>${satir}</table>`;
 }
 
-const katman = [], aranan = [];
+const katman = [], aranan = [], etiketler = [];
 const sira = [...new Set(KATMANLAR.map(k => k.grup))];
 const liste = document.getElementById("liste");
 const ust = ["Üst koruma", "İdari sınırlar"];  // geniş alanlar altta çizilsin
@@ -84,12 +91,38 @@ KATMANLAR.forEach((k, i) => {
     pointToLayer: (f, ll) => L.circleMarker(ll, { pane: pn, radius: k.grup === "Proje" ? 7 : 5, color: "#222", weight: 1, fillColor: k.renk, fillOpacity: .95 }),
     onEachFeature: (f, l) => {
       l.bindPopup(() => popup(k, f.properties || {}));
-      const p = f.properties || {}; const ad = p.ad || p.label_text || p.name || "";
+      const p = f.properties || {}; const ad = p.ad || p.label_text || p.name || p.ADI || p.mahalle || "";
+      const etiket = etiketMetni(k, p);
+      l.bindTooltip(`${esc(etiket)}<br><span style="opacity:.75">${esc(k.ad)}</span>`, { sticky: true });
       if (ad) aranan.push({ ad: String(ad), alt: k.ad, l });
+      if (etiket && !k.cizgi) etiketler.push({ k, i, l, metin: etiket });
     }
   });
   katman[i] = lyr; if (k.acik) lyr.addTo(map);
 });
+
+// Kalıcı ad etiketleri: yakınlaştıkça görünür (öncelikli katmanlar daha erken)
+function etiketMetni(k, p) {
+  const ad = p.ad || p.label_text || p.name || p.ADI || "";
+  const genel = /^(\d\.?\s*)?(derece\s*)?(arkeoloji̇?k|ark\.?)\s*sit( alanı)?$|^\d\.\s*arkeoloji̇?k sit alanı$|^mevcut$/i;
+  if (ad && !genel.test(ad.trim())) return ad;
+  if (p.envanter_no) return `${k.ad} (${p.envanter_no})`;
+  return ad;
+}
+const esik = k => k.grup === "Proje" ? 9 : /tabya|Askerî/.test(k.ad) ? 11 : k.grup.startsWith("Tescilli") ? 14 : k.grup === "Üst koruma" ? 9 : 12;
+const etiketKatmani = L.layerGroup().addTo(map);
+function etiketleriCiz() {
+  etiketKatmani.clearLayers();
+  const z = map.getZoom(), b = map.getBounds().pad(0.1);
+  etiketler.forEach(e => {
+    if (z < esik(e.k) || !map.hasLayer(katman[e.i])) return;
+    const c = e.l.getLatLng ? e.l.getLatLng() : e.l.getBounds().getCenter();
+    if (!b.contains(c)) return;
+    etiketKatmani.addLayer(L.marker(c, { interactive: false, icon: L.divIcon({ className: "etk" + (e.k.grup === "Proje" ? " buyuk" : ""), html: esc(e.metin.length > 42 ? e.metin.slice(0, 40) + "…" : e.metin), iconSize: null }) }));
+  });
+}
+map.on("zoomend moveend overlayadd overlayremove", etiketleriCiz);
+setTimeout(etiketleriCiz, 300);
 
 sira.forEach(g => {
   const d = document.createElement("div"); d.className = "grup";
