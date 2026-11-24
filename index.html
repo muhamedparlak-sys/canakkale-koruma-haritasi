@@ -81,6 +81,10 @@ body.okuma main{grid-template-columns:min(660px,52vw) 1fr}
 .ozet h3{font-size:15px;margin:12px 0 6px;letter-spacing:.04em;color:var(--tunc)}
 .gemi.hayal{opacity:.5;filter:none}
 .gemi.kp path{fill:#FF5C70;stroke:#C8102E}
+body.lacivert #map{background:radial-gradient(120% 90% at 35% 30%,#0E4C6C 0%,#00354F 50%,#00243A 100%)}
+body.lacivert .leaflet-kara-pane{filter:drop-shadow(0 3px 8px rgba(0,20,32,.55))}
+body.lacivert .sade-et.b{color:rgba(230,240,245,.72);text-shadow:none;letter-spacing:.24em}
+body.lacivert .sade-et{color:#00354F}
 #rSay{position:absolute;right:12px;bottom:28px;z-index:600;width:min(300px,46%);max-height:62%;overflow:hidden;background:rgba(255,255,255,.94);border:1px solid #D3D9DC;border-radius:12px;padding:10px 12px;box-shadow:0 6px 18px rgba(0,0,0,.14);font:14px/1.35 Figtree,sans-serif;color:#0A1114;display:none}
 body.sade #rSay.on{display:block}
 #rSay b{font:800 22px "Sofia Sans Condensed","Arial Narrow",sans-serif;color:#00354F}
@@ -326,15 +330,25 @@ map.createPane("altlik").style.zIndex = 150;
 map.createPane("proje").style.zIndex = 460;
 /* Altlıklar: uydu (yer adlı), harita, kabartma; hikâye kipi kabartmayla oynar */
 const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/";
+const KAT_HAM = window.KATMANLAR || [];
 const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19, attribution:"© OpenStreetMap"});
 const uydu = L.layerGroup([L.tileLayer(ESRI+"World_Imagery/MapServer/tile/{z}/{y}/{x}", {maxZoom:19, attribution:"Esri, Maxar"}), L.tileLayer(ESRI+"Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {maxZoom:19, pane:"overlayPane"})]);
 const kampanya = L.layerGroup(Object.entries(window.ALTLIK || {}).map(([ad,b]) => L.imageOverlay("altlik_"+ad+".jpg", b, {pane:"altlik", attribution: ad==="ege"?"Kabartma: GEBCO 2024":""})));
-const ALTLIK = {"Uydu (yer adlı)": uydu, "Harita": osm, "Kabartma": kampanya};
+map.createPane("kara").style.zIndex = 250;
+const karaRen = L.svg({pane:"kara", padding:.5});
+const projeAlt = L.layerGroup((() => {
+  const il = KAT_HAM.find(k => k.ad === "İlçe sınırları"), ky = KAT_HAM.find(k => /^İl kıyısı/.test(k.ad));
+  const out = [];
+  if (il) out.push(L.geoJSON(il.veri, {pane:"kara", renderer:karaRen, interactive:false, style:{stroke:true, color:"#F3EEE3", weight:.8, fillColor:"#F3EEE3", fillOpacity:1}}));
+  if (ky) out.push(L.geoJSON(ky.veri, {pane:"kara", renderer:karaRen, interactive:false, style:{color:"#C9A24A", weight:1.1, opacity:.9}}));
+  return out;
+})());
+const ALTLIK = {"Proje (sade)": projeAlt, "Uydu (yer adlı)": uydu, "Harita": osm, "Kabartma": kampanya};
 uydu.addTo(map);
 L.control.layers(ALTLIK, null, {position:"topright"}).addTo(map);
 const altlikSimdi = () => Object.values(ALTLIK).find(l => map.hasLayer(l));
-function altlikSec(l){ Object.values(ALTLIK).forEach(x => { if (x !== l) map.removeLayer(x); }); l.addTo(map); document.body.classList.toggle("acik", l !== uydu); }
-map.on("baselayerchange", e => document.body.classList.toggle("acik", e.layer !== uydu));
+function altlikSec(l){ Object.values(ALTLIK).forEach(x => { if (x !== l) map.removeLayer(x); }); l.addTo(map); document.body.classList.toggle("acik", l !== uydu); document.body.classList.toggle("lacivert", l === projeAlt); }
+map.on("baselayerchange", e => { document.body.classList.toggle("acik", e.layer !== uydu); document.body.classList.toggle("lacivert", e.layer === projeAlt); });
 
 /* Koruma katmanları (webgis_veri.py → koruma.js): kayıt açılır, ad etiketleri yakınlaştıkça çıkar */
 function popup(k, p){
@@ -634,22 +648,26 @@ function gostergeHTML(b){
 const YILLAR = [
   {yil:"2022", gemi:143, yolcu:220082, kaynak:"Ulaştırma ve Altyapı Bakanlığı (Bloomberg HT)"},
   {yil:"2023", gemi:225, yolcu:402729, kaynak:"Ulaştırma ve Altyapı Bakanlığı (haberler.com)"},
-  {yil:"2024", gemi:184, yolcu:402226, kaynak:"Ulaştırma ve Altyapı Bakanlığı (DHA)", not:"Ocak–Ekim"},
+  {yil:"2024", gemi:184, yolcu:402226, kaynak:"Ulaştırma ve Altyapı Bakanlığı (DHA)", not:"yılın ilk 10 ayı"},
   {yil:"2025", gemi:265, yolcu:625517, kaynak:"Ulaştırma ve Altyapı Bakanlığı (Plan 2.3.3)"},
-  {yil:"2026", gemi:119, yolcu:265369, kaynak:"İstanbul Liman Başkanlığı (Euronews)", not:"Ocak–Temmuz"},
+  {yil:"2026", gemi:119, yolcu:265369, kaynak:"İstanbul Liman Başkanlığı (Euronews)", not:"yılın ilk 7 ayı"},
   {yil:"2027", gemi:188, yolcu:403745, kaynak:"CruiseMapper tarifesi", ileri:true},
-  {yil:"2028", gemi:83, yolcu:137894, kaynak:"CruiseMapper tarifesi", ileri:true, not:"tarife dolmadı"},
+  {yil:"2028", gemi:83, yolcu:137894, kaynak:"CruiseMapper tarifesi", ileri:true, not:"tarife henüz tamamlanmadı"},
 ];
 const HARCAMA = 100;            // $/yolcu, günübirlik: planın hedef harcaması (Plan 2.3.3; kullanıcı kararı 24.11.2026); Planlama Ekibi hesabı / VARSAYIM
 const KEPEZ_ORAN = 40 / 265;    // 2025'te Kepez'e ~40 gemi, İstanbul'a 265 (Plan 2.3.3); diğer yıllara aynı oran (VARSAYIM)
 const GECIS = 3200;             // bir geminin ekranda Boğaz'ı geçişi (ms)
 const ARA = {gecmis: 32, ileri: 22};   // iki gemi arası (ms); üç şerit → şerit başına bunun üç katı
-const yilSure = y => Math.round(y.gemi * (y.ileri ? ARA.ileri : ARA.gecmis) + GECIS + 700);
+const yilSure = y => Math.round(y.gemi * (y.ileri ? ARA.ileri : ARA.gecmis) + GECIS + 2600);
 const YBAS = (() => { const b = [0]; YILLAR.forEach(y => b.push(b.at(-1) + yilSure(y))); return b; })();   // yılların başlangıç anları
-const ROTA = [[40.00,26.10],[40.03,26.19],[40.075,26.27],[40.115,26.345],[40.140,26.380],[40.160,26.395],[40.195,26.410],[40.235,26.445],[40.285,26.520],[40.330,26.585],[40.375,26.650],[40.415,26.715],[40.455,26.800]];
-const KEPEZ_YOL = [[40.00,26.10],[40.03,26.19],[40.075,26.27],[40.092,26.335],[40.097,26.378]];
+const ROTA = [[39.985,26.10],[40.005,26.17],[40.0231,26.2245],[40.0346,26.2624],[40.0491,26.2967],[40.0684,26.325],[40.0819,26.3344],
+  [40.0938,26.3459],[40.1089,26.3533],[40.1248,26.3859],[40.1406,26.3925],[40.16,26.392],[40.1888,26.3854],[40.198,26.402],[40.2058,26.4167],
+  [40.2169,26.4551],[40.2307,26.4901],[40.2514,26.5169],[40.2768,26.5376],[40.2938,26.5689],[40.3079,26.6035],[40.3309,26.6274],
+  [40.3555,26.6493],[40.3843,26.666],[40.4018,26.6965],[40.4243,26.7209],[40.4301,26.7399],[40.455,26.80],[40.48,26.86]];   // su ekseni, şematik
+const KEPEZ_YOL = [...ROTA.slice(0, 9), [40.114,26.372], [40.1023,26.3837], [40.114,26.376], ...ROTA.slice(9)];   // limana yanaşır, sonra İstanbul'a devam eder
+const DURAK = 1500;             // Kepez'de duraklama (ms)
 function yolHesap(Y){ const u = [0]; for (let i = 1; i < Y.length; i++) u.push(u[i-1] + Math.hypot(Y[i][0]-Y[i-1][0], (Y[i][1]-Y[i-1][1]) * .77)); return u; }
-const rotaUz = yolHesap(ROTA), kepezUz = yolHesap(KEPEZ_YOL);
+const rotaUz = yolHesap(ROTA), kepezUz = yolHesap(KEPEZ_YOL), KEPEZ_P = kepezUz[10] / kepezUz.at(-1), GECIS_K = GECIS * kepezUz.at(-1) / rotaUz.at(-1);
 function yolNoktasi(Y, U, p){
   const Lp = p * U.at(-1); let i = 1; while (i < U.length - 1 && U[i] < Lp) i++;
   const t = (Lp - U[i-1]) / (U[i] - U[i-1] || 1), a = Y[i-1], b = Y[i];
@@ -670,7 +688,7 @@ const kepezSay = y => Math.round(y.gemi * KEPEZ_ORAN);
 function radarHTML(){
   return `<section class="radar" aria-label="Boğaz radarı">
     <div class="rb"><span><i></i>BOĞAZ RADARI · ÖNÜNÜZDEN GEÇEN KRUVAZİYER</span><button id="rTekrar" aria-label="Baştan oynat">↻</button></div>
-    <div class="yl" id="rYil" role="tablist">${YILLAR.map((y, i) => `<button data-i="${i}"${y.ileri ? ' class="ileri"' : ""}>${y.yil}${y.ileri ? " beklenen" : y.not ? " · " + y.not : ""}</button>`).join("")}<button data-i="${YILLAR.length}">Özet</button></div>
+    <div class="yl" id="rYil" role="tablist">${YILLAR.map((y, i) => `<button data-i="${i}"${y.ileri ? ' class="ileri"' : ""}>${y.yil}${y.ileri ? " beklenen" : ""}</button>`).join("")}<button data-i="${YILLAR.length}">Özet</button></div>
     <p class="lej" id="rLej"></p>
     <div class="kb">Kişi başı günübirlik harcama: <b>${HARCAMA} $</b> · bugün Gelibolu turu yemek, rehber ve ulaşım dahil ~24 $</div>
     <div class="sy"><div><b id="rGs">0</b><span>gemi</span></div><div><b id="rYl">0</b><span id="rYlE">yolcu önünüzden geçti</span></div><div class="in"><b id="rPr">0</b><span id="rPrE">kaçırılan ekonomik değer</span></div></div>
@@ -705,11 +723,11 @@ function sayacKur(i){
   if (!k) { k = document.createElement("div"); k.id = "rSay"; k.setAttribute("aria-live", "off"); document.getElementById("map").appendChild(k); }
   k.classList.toggle("on", i >= 0 && i < YILLAR.length); if (!(i >= 0 && i < YILLAR.length)) return;
   const y = YILLAR[i];
-  k.innerHTML = `<div><b id="rSayN">0</b> gemi ${y.ileri ? "geçecek" : "geçti"} · <span class="k"><span id="rSayK">0</span> tanesi Kepez'e uğradı</span></div><div class="iz${y.ileri ? " hayal" : ""}" id="rSayIz"></div><small>Her çizgi gerçek bir gemi${y.ileri ? " (tarifede)" : ""}; kırmızılar Kepez'e uğrayanlar.</small>`;
+  k.innerHTML = `<div><b id="rSayN">0</b> gemi ${y.ileri ? "geçecek" : "geçti"} · <span class="k"><span id="rSayK">0</span> tanesi Kepez'de durakladı</span></div><div class="iz${y.ileri ? " hayal" : ""}" id="rSayIz"></div><small>Her çizgi gerçek bir gemi${y.ileri ? " (tarifede)" : ""}; kırmızılar Kepez'de kısa bir süre durup İstanbul'a devam edenler.</small>`;
 }
 function filoKur(i){
   radarKat.clearLayers(); filo = []; sayacKur(i);
-  L.polyline(ROTA, {color:"#00354F", weight:2, opacity:.35, dashArray:"2 8", lineCap:"round", interactive:false}).addTo(radarKat);
+  L.polyline(ROTA, {color:"#74C6EA", weight:2, opacity:.45, dashArray:"2 8", lineCap:"round", interactive:false}).addTo(radarKat);
   if (i >= YILLAR.length) return;
   const y = YILLAR[i], n = y.gemi, hayal = !!y.ileri, ara = y.ileri ? ARA.ileri : ARA.gecmis, kp = kepezSay(y);
   for (let k = 0; k < n; k++) {
@@ -720,7 +738,7 @@ function filoKur(i){
 function radarGoster(i, t){
   const $ = id => document.getElementById(id); if (!$("rGs")) return;
   const top = i >= YILLAR.length, y = top ? TOPLAM : YILLAR[i];
-  const f = top ? 1 : Math.min(1, t / Math.max(1, yilSure(y) - GECIS - 700)), e = f;
+  const f = top ? 1 : Math.min(1, t / Math.max(1, yilSure(y) - GECIS - 2600)), e = f;
   $("rLej").textContent = top ? `Özet: son beş yıl ve tarifede görünen iki yıl.`
     : y.ileri ? `${y.yil}: kesik çizgili simgeler tarifede görünen, henüz geçmemiş gemiler. Her simge bir gemi.`
     : `${y.yil}: her simge o yıl gerçekten geçen bir gemi. Gemiler aynı yoldan döner.`;
@@ -736,15 +754,16 @@ function radarGoster(i, t){
     : `${y.yil}${y.not ? " (" + y.not + ")" : ""}: ${sayi(y.gemi)} gemi dolusu insan kordonun önünden geçti; dönüp bakmadık.`;
   if (top) return;
   for (const g of filo) {
-    const p = (t - g.bas) / (g.kepez ? GECIS * .55 : GECIS);
-    const bitis = g.kepez ? 1 + 1200 / (GECIS * .55) : 1;     // Kepez'de 1,2 sn durur
+    const e = t - g.bas, varis = KEPEZ_P * GECIS_K;
+    const p = !g.kepez ? e / GECIS : e < varis ? e / GECIS_K : e < varis + DURAK ? KEPEZ_P : (e - DURAK) / GECIS_K;
+    const bitis = 1;
     if (!g.sayildi && p >= 1) { g.sayildi = true; const iz = document.getElementById("rSayIz");
       if (iz) { const c = document.createElement("i"); if (g.kepez) c.className = "kp"; iz.appendChild(c);
         const n = document.getElementById(g.kepez ? "rSayK" : "rSayN"); n.textContent = +n.textContent + 1;
         if (g.kepez) { const t = document.getElementById("rSayN"); t.textContent = +t.textContent + 1; } } }
     if (p < 0 || p > bitis) { if (g.ekli) { radarKat.removeLayer(g.m); g.ekli = false; } continue; }
     if (!g.ekli) { g.m.addTo(radarKat); g.ekli = true; }
-    const n = g.kepez ? yolNoktasi(KEPEZ_YOL, kepezUz, Math.min(p, 1)) : seritNokta(p, g.kay);
+    const n = g.kepez ? yolNoktasi(KEPEZ_YOL, kepezUz, p) : seritNokta(p, g.kay);
     g.m.setLatLng(n.ll);
     const el = g.m.getElement(); if (el) el.firstChild.style.transform = `rotate(${n.aci}deg)`;
   }
@@ -762,7 +781,7 @@ function radarOynat(bas){ cancelAnimationFrame(rKare); rI = -1; rT0 = 0; rKare =
 let sadeOnceki = null;
 const SADE_ET = [[40.152,26.43,"Çanakkale",0],[40.097,26.42,"Kepez Limanı",0],[39.985,26.255,"Troya",0],[40.06,25.98,"EGE",1],[40.50,26.92,"MARMARA · İstanbul'a",1]];
 function sadeAc(){
-  if (!document.body.classList.contains("sade")) { sadeOnceki = altlikSimdi(); altlikSec(kampanya); }
+  if (!document.body.classList.contains("sade")) { sadeOnceki = altlikSimdi(); altlikSec(projeAlt); }
   document.body.classList.add("sade");
   [projeKat, halkaKat, ...katman].forEach(l => map.removeLayer(l)); etiketKat.clearLayers(); map.closePopup();
   const i = KAT.findIndex(k => /^Büyük proje sahası \(taslak\)/.test(k.ad)); if (i >= 0) katman[i].addTo(map);
