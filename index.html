@@ -590,7 +590,7 @@ const YILLAR = [
   /* 2027: CruiseMapper İstanbul tarifesinde 24.11.2026 itibarıyla görünen uğraklar (Ocak–Kasım), yolcu = gemilerin alt kapasitesi (portal/kruz.py girdisi) */
   {yil:"2027", gemi:180, yolcu:388445, kaynak:"CruiseMapper tarifesi, 24.11.2026 itibarıyla", not:"tarifede görünen", ileri:true},
 ];
-const HARCAMA = [60, 80];       // $/yolcu, günübirlik: liman işletmesi tahmini (Plan 2.3.3); Planlama Ekibi hesabı / VARSAYIM
+const HARCAMA = 100;            // $/yolcu, günübirlik: planın hedef harcaması (Plan 2.3.3; kullanıcı kararı 24.11.2026); Planlama Ekibi hesabı / VARSAYIM
 const YIL_SURE = 6500;          // her yıl 6,5 sn; dört yıl + özet ≈ 26 sn
 const ROTA = [[40.00,26.10],[40.03,26.19],[40.075,26.27],[40.115,26.345],[40.140,26.380],[40.160,26.395],[40.195,26.410],[40.235,26.445],[40.285,26.520],[40.330,26.585],[40.375,26.650],[40.415,26.715],[40.455,26.800]];
 const rotaUz = (() => { const u = [0]; for (let i = 1; i < ROTA.length; i++) u.push(u[i-1] + Math.hypot(ROTA[i][0]-ROTA[i-1][0], (ROTA[i][1]-ROTA[i-1][1]) * .77)); return u; })();
@@ -603,20 +603,20 @@ const radarKat = L.layerGroup();
 let rKare = 0, rT0 = 0, rBitti = false;
 const sayi = n => Math.round(n).toLocaleString("tr-TR");
 const mUsd = n => (n / 1e6).toLocaleString("tr-TR", {maximumFractionDigits: 1}) + " milyon $";
-const mAra = n => (n * HARCAMA[0] / 1e6).toLocaleString("tr-TR", {maximumFractionDigits: 0}) + "–" + (n * HARCAMA[1] / 1e6).toLocaleString("tr-TR", {maximumFractionDigits: 0}) + " milyon $";
+const mAra = n => (n * HARCAMA / 1e6).toLocaleString("tr-TR", {maximumFractionDigits: 1}) + " milyon $";
 const GECMIS = YILLAR.filter(y => !y.ileri), Y27 = YILLAR.find(y => y.ileri);
 const TOPLAM = GECMIS.reduce((t, y) => ({gemi: t.gemi + y.gemi, yolcu: t.yolcu + y.yolcu}), {gemi: 0, yolcu: 0});
 function radarHTML(){
   return `<section class="radar" aria-label="Boğaz radarı">
     <div class="rb"><span><i></i>BOĞAZ RADARI · ÖNÜNÜZDEN GEÇEN KRUVAZİYER</span><button id="rTekrar" aria-label="Baştan oynat">↻</button></div>
     <div class="yl" id="rYil" role="tablist">${YILLAR.map((y, i) => `<button data-i="${i}">${y.yil}${y.not ? "*" : ""}</button>`).join("")}<button data-i="${YILLAR.length}">Özet</button></div>
-    <div class="kb">Kişi başı günübirlik harcama: <b>60–80 $</b></div>
+    <div class="kb">Kişi başı günübirlik harcama: <b>${HARCAMA} $</b> · bugün Gelibolu turu yemek, rehber ve ulaşım dahil ~24 $</div>
     <div class="sy"><div><b id="rGs">0</b><span>gemi</span></div><div><b id="rYl">0</b><span id="rYlE">yolcu önünüzden geçti</span></div><div class="in"><b id="rPr">0</b><span id="rPrE">kaçırılan ekonomik değer</span></div></div>
     <p class="lej">Haritada her ok bir gemi; bir yılın gemileri 6,5 saniyede geçer.</p>
     <p class="soz" id="rSoz">Su akar; gemi dolusu insan kordonun önünden geçer.</p>
     <div class="calis"><b>Acil adım: Aralık 2026 sonu kruvaziyer toplantısı</b><span>Hatırlatma: 2027'de önünüzden en az ${sayi(Y27.yolcu)} yolcu geçecek; ekonomik değeri ${mAra(Y27.yolcu)}. ÇTSO kruvaziyer masasının ilk toplantısı (P-8); ana sorumlu ÇTSO, koordinasyon Valilik; masada Kepez Limanı işletmecisi, Belediye, İl Kültür ve Turizm Müdürlüğü ve acentalar.</span>
       <ol><li>2027'de Kepez'e uğrayacak gemilere liman kapısında tek fiyatlı paket: Troya, müze, öğle yemeği, ulaşım (hızlı kazanım).</li><li>2028–2029 İstanbul seferlerine ilk ya da son gün Çanakkale uğrağı: rota satışı (rotalar 2–3 yıl önceden belirlenir).</li><li>Liman–kent–Troya arasında sabit fiyatlı, tarifeli bağlantı; gemi günleri için otobüs ve rehber havuzu.</li><li>Liman çıkışında ilan edilen sabit taksi ve transfer tarifesi.</li></ol></div>
-    <p class="not">İstanbul'a uğrayan gemi ve yolcu: ${YILLAR.map(y => `${y.yil}${y.not ? " (" + y.not + ")" : ""} ${esc(y.kaynak)}`).join("; ")}. Bu gemilerin neredeyse tamamı Çanakkale Boğazı'ndan gelip aynı yoldan döner; yolcu bir kez sayılır (Plan 2.3.3). Kaçırılan ekonomik değer: yolcu × kişi başı günübirlik harcama ${HARCAMA[0]}–${HARCAMA[1]} $ (Kepez liman işletmesi tahmini; Avrupa'da uğrak limanında yolcu başına 70–90 €, CLIA; Plan 2.3.3); Planlama Ekibi hesabı / VARSAYIM. Bugün Kepez'e inen yılda yaklaşık 20 bin yolcu, geçenin yaklaşık %3'ü. Rota şematiktir.</p>
+    <p class="not">İstanbul'a uğrayan gemi ve yolcu: ${YILLAR.map(y => `${y.yil}${y.not ? " (" + y.not + ")" : ""} ${esc(y.kaynak)}`).join("; ")}. Bu gemilerin neredeyse tamamı Çanakkale Boğazı'ndan gelip aynı yoldan döner; yolcu bir kez sayılır (Plan 2.3.3). Kaçırılan ekonomik değer: yolcu × kişi başı günübirlik harcama ${HARCAMA} $ (planın hedef harcaması: yemek, hediyelik eşya ve müze girişi; Plan 2.3.3); Planlama Ekibi hesabı / VARSAYIM. Bugün acentaların Gelibolu Yarımadası turu yemek, rehber ve ulaşım dahil kişi başı yaklaşık 24 $: proje ekibi bilgisi (Kasım 2026). Bugün Kepez'e inen yılda yaklaşık 20 bin yolcu, geçenin yaklaşık %3'ü. Rota şematiktir.</p>
   </section>`;
 }
 function ozetHTML(){
