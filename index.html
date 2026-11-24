@@ -33,6 +33,35 @@ body.okuma main{grid-template-columns:min(660px,52vw) 1fr}
 .ilr .cb{flex:1;height:4px;background:var(--soft);border-radius:2px;overflow:hidden}
 .ilr .cb i{display:block;height:100%;background:var(--tunc);transition:width .4s ease}
 .ilr button{border:0;background:none;font:inherit;color:var(--mute);text-decoration:underline;cursor:pointer;padding:6px 0;min-height:32px}
+.radar{background:var(--gece);color:#fff;border-radius:10px;padding:14px 14px 12px;margin:0 0 18px;border-left:3px solid #E4C16C}
+.radar .rb{font-family:var(--fh);font-weight:800;font-size:12px;letter-spacing:.08em;color:#E4C16C;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.radar .rb i{width:8px;height:8px;border-radius:50%;background:#E4C16C;display:inline-block;margin-right:6px;animation:rnab 1.6s ease-in-out infinite}
+@keyframes rnab{50%{opacity:.25}}
+.radar .tar{font-family:var(--fh);font-weight:800;font-size:28px;line-height:1.1;margin-top:6px}
+.radar .gm{min-height:20px;font-size:14px;color:#D3D9DC;margin-top:2px}
+.radar .sy{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
+.radar .sy b{display:block;font-family:var(--fh);font-size:28px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.radar .sy span{font-size:11.5px;color:#AAB7BD}
+.radar .sy .in b{color:#FF5C70}
+.radar .ctl{display:flex;gap:8px;align-items:center;margin-top:10px}
+.radar input[type=range]{flex:1;accent-color:#E4C16C}
+.radar button{background:transparent;border:1px solid #E4C16C;color:#E4C16C;border-radius:6px;padding:3px 10px;font-weight:700;cursor:pointer;min-width:34px}
+.radar button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.radar .soz{font-family:var(--fh);font-weight:800;font-size:19px;line-height:1.2;margin:12px 0 0}
+.radar .not{font-size:11px;color:#AAB7BD;margin:8px 0 0;line-height:1.4}
+.ozet{margin:0 0 18px}
+.ozet .vz{font-family:var(--fh);font-size:19px;font-weight:700;line-height:1.25;color:var(--sea);margin:4px 0 12px;border-left:3px solid var(--tunc);padding-left:10px}
+.ozet .dg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.ozet .dg span{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--soft);border:1px solid var(--line)}
+.ozet .am{display:grid;gap:8px;margin:0 0 10px}
+.ozet .am div{border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+.ozet .am b{font-family:var(--fh);font-size:15px;display:block}
+.ozet .am span{font-size:13px;color:var(--mute)}
+.ozet ol{margin:0 0 6px;padding-left:20px;font-size:14px}
+.ozet h3{font-size:15px;margin:12px 0 6px;letter-spacing:.04em;color:var(--tunc)}
+.gemi{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:16px solid #FF5C70;filter:drop-shadow(0 0 4px rgba(255,92,112,.9))}
+.leaflet-tooltip.gemi-et{background:rgba(10,17,20,.88);color:#fff;border:0;font:600 12px Figtree,sans-serif;padding:2px 6px;box-shadow:none}
+.leaflet-tooltip.gemi-et:before{display:none}
 .bento{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .kt{position:relative;text-align:left;font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px 11px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-height:76px;transition:border-color .15s,transform .15s}
 .kt:hover{border-color:var(--sea);transform:translateY(-1px)}
@@ -177,7 +206,7 @@ body.hk .leaflet-top{top:172px}
 #hk h2{color:#fff;font-size:23px;margin:6px 0 6px}
 #hk p{margin:0 0 10px;font-size:15.5px;line-height:1.5}
 #hk .ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-#hk button{background:#fff;color:#0A1114;border:0;border-radius:8px;font:inherit;font-weight:700;padding:8px 14px;min-height:40px;cursor:pointer}
+#hk button{background:#E4C16C;color:#0A1114;border:0;border-radius:8px;font:inherit;font-weight:700;padding:8px 14px;min-height:40px;cursor:pointer}
 #hk button.ik{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35)}
 #hk .nok2{display:flex;gap:4px;margin-left:auto}
 #hk .nok2 i{width:7px;height:7px;border-radius:50%;background:#475459;display:block}
@@ -185,8 +214,8 @@ body.hk .leaflet-top{top:172px}
 #hk .son{background:#C8102E;color:#fff}
 body.hk #map{grid-column:1/-1}
 body.hk #panel{display:none}
-.hk-et{width:max-content;color:#2b2118;font-weight:800;font-size:13px;white-space:nowrap;text-shadow:0 0 3px #f3ead6,0 0 3px #f3ead6,0 0 6px #f3ead6;transform:translate(-50%,-50%);pointer-events:none}
-.hk-et.b{font-size:26px;color:#5a3e1b;opacity:.85}
+.hk-et{width:max-content;color:#0A1114;font-family:"Figtree",sans-serif;font-weight:700;font-size:13px;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 6px #fff;transform:translate(-50%,-50%);pointer-events:none}
+.hk-et.b{font-family:"Sofia Sans Condensed","Arial Narrow",sans-serif;font-weight:800;font-size:26px;color:#00354F;opacity:.9;letter-spacing:.02em}
 .hk-et.sag{transform:translate(8px,-50%)}.hk-et.sol{transform:translate(calc(-100% - 8px),-50%)}
 .hk-ik{filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 .hk-pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1) both}
@@ -234,6 +263,7 @@ body.hk #panel{display:none}
 <script src="altlik.js"></script>
 <script src="hikaye.js"></script>
 <script src="bolumler.js"></script>
+<script src="kruz.js"></script>
 <script>
 {
 const D = window.PLAN, PR = D.projeler, IP = D.ip, KAT = window.KATMANLAR || [];
@@ -540,10 +570,98 @@ function gostergeHTML(b){
   if (g) return `<span class="dg">${esc(g.deger)}</span><span class="al">${esc(g.alt)}</span>`;
   return `<span class="al">${b.alt.length} alt bölüm</span>`;
 }
+
+/* ---- Açılış: Boğaz radarı + planın makro özeti (kullanıcı kararı 24.11.2026) ---- */
+/* Şematik geçiş rotası (Ege girişi → Çanakkale önü → Marmara); KORDON = kent önü */
+const ROTA = [[40.00,26.10],[40.03,26.19],[40.075,26.27],[40.115,26.345],[40.140,26.380],[40.160,26.395],[40.195,26.410],[40.235,26.445],[40.285,26.520],[40.330,26.585],[40.375,26.650],[40.415,26.715],[40.455,26.800]];
+const KORDON = [40.150, 26.395], GECIS_SURE = 4 * 3600e3;
+const rotaUz = (() => { const u = [0]; for (let i = 1; i < ROTA.length; i++) u.push(u[i-1] + Math.hypot(ROTA[i][0]-ROTA[i-1][0], (ROTA[i][1]-ROTA[i-1][1]) * .77)); return u; })();
+const rotaP = (() => { let en = 1e9, k = 0; ROTA.forEach((r, i) => { const d = Math.hypot(r[0]-KORDON[0], r[1]-KORDON[1]); if (d < en) { en = d; k = i; } }); return rotaUz[k] / rotaUz.at(-1); })();
+function rotaNokta(p){
+  const Lp = p * rotaUz.at(-1); let i = 1; while (i < rotaUz.length - 1 && rotaUz[i] < Lp) i++;
+  const t = (Lp - rotaUz[i-1]) / (rotaUz[i] - rotaUz[i-1] || 1), a = ROTA[i-1], b = ROTA[i];
+  return {ll: [a[0] + (b[0]-a[0]) * t, a[1] + (b[1]-a[1]) * t], aci: Math.atan2((b[1]-a[1]) * .77, b[0]-a[0]) * 180 / Math.PI};
+}
+const KZ = window.KRUZ || {g: [], aralik: ["2026-11-24", "2027-11-23"]};
+const KG = KZ.g.map(([t, ad, kap, yon]) => ({t: Date.parse(t + ":00"), ad, kap: kap || 0, yon}));
+const R_BAS = Date.parse(KZ.aralik[0] + "T00:00:00"), R_SON = Date.parse(KZ.aralik[1] + "T23:59:00");
+const radarKat = L.layerGroup(), gemiIz = new Map();
+let rT = R_BAS, rOyna = true, rSon = 0, rKare = 0;
+const AYLAR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const sayi = n => Math.round(n).toLocaleString("tr-TR");
+const trTarih = s => s.split("-").reverse().join(".");
+function radarHTML(){
+  return `<section class="radar" aria-label="Boğaz radarı">
+    <div class="rb"><span><i></i>BOĞAZ RADARI · KRUVAZİYER GEÇİŞLERİ</span><span>${sayi(KZ.gemi||0)} gemi</span></div>
+    <div class="tar" id="rTar">—</div><div class="gm" id="rGm" aria-live="off"></div>
+    <div class="sy"><div><b id="rGs">0</b><span>gemi geçişi</span></div><div><b id="rYl">0</b><span>yolcu önünüzden geçti</span></div><div class="in"><b>%3</b><span>bugün Çanakkale'ye iniyor</span></div></div>
+    <div class="ctl"><button id="rOy" aria-label="Duraklat">❚❚</button><input type="range" id="rSl" min="${R_BAS}" max="${R_SON}" step="3600000" value="${rT}" aria-label="Tarih"></div>
+    <p class="soz">Su akar; yılda 600 bin yolcu kordonun önünden geçer. Yüzde üçü iner.</p>
+    <p class="not">Gemiler ve tarihler: ${esc(KZ.kaynak||"")}, ${trTarih(KZ.aralik[0])}–${trTarih(KZ.aralik[1])}. ${esc(KZ.varsayim||"")} Yolcu her uğrakta bir kez sayılır; rota şematiktir. Yıllık 600 bin yolcu tahmini 2025'te İstanbul'a uğrayan 265 gemi ve 625.517 yolcudan türetilmiştir; Kepez'e inen yaklaşık 20 bin yolcudur (Plan 2.3.3).</p>
+  </section>`;
+}
+function ozetHTML(){
+  return `<section class="ozet" aria-label="Planın özeti">
+    <h2>Plan ne hedefliyor?</h2>
+    <p class="vz">Akıntıyı da rüzgârı da arkasına alan Çanakkale: Troya'dan 1915'e iki kıtada miras yolculuğunun kapısı; kıyısını halka açmış, dört mevsim yaşanan bir Boğaz kenti.</p>
+    <div class="dg"><span>Gelibolu Tarihi Alanı · yılda ~5 milyon ziyaret</span><span>Troya</span><span>Boğaz ve kordon</span><span>Adalar</span><span>Kaz Dağları</span></div>
+    <div class="am">
+      <div><b>Gelibolu: korunarak daha çok kişiye</b><span>Önce koruma, anmanın niteliği ve güvenlik; ziyaret 2025'te ~5 milyon, 2030 önerisi 6 milyon.</span></div>
+      <div><b>Kent, Troya, adalar, Kaz Dağları: kalış uzasın</b><span>Ortalama kalış 2025'te 1,79 gece, aylık doluluk %27.</span></div>
+    </div>
+    <h3>İKİ SOMUT HEDEF</h3>
+    <ol><li>Normandiya ile ilk sıradaki Gelibolu, bu yerini marka değerine dönüştürsün.</li><li>Çanakkale gecelemede Türkiye'nin ilk 10 ili arasına girsin.</li></ol>
+    <p class="say"><span class="lnk" data-h="bolum-3">Vizyon ve hedefler: Bölüm 3 →</span> Aşağıdaki 12 bölüm bu hedeflere nasıl ulaşılacağını anlatır.</p>
+  </section>`;
+}
+function radarCiz(){
+  const ac = [];
+  for (const g of KG) {
+    if (g.t < rT - GECIS_SURE * 1.2) continue; if (g.t > rT + GECIS_SURE * 1.2) break;
+    const p = rotaP + (rT - g.t) / GECIS_SURE * (g.yon === "K" ? 1 : -1);
+    if (p < 0 || p > 1) continue;
+    ac.push(g); const k = g.t + g.ad, n = rotaNokta(p), aci = g.yon === "K" ? n.aci : n.aci + 180;
+    let m = gemiIz.get(k);
+    if (!m) { m = L.marker(n.ll, {interactive:false, keyboard:false, icon: L.divIcon({className:"", html:`<div class="gemi"></div>`, iconSize:[12,16], iconAnchor:[6,8]})})
+      .bindTooltip(`${esc(g.ad)} · ${g.kap ? sayi(g.kap) + " yolcu" : "kapasite bilinmiyor"}`, {permanent:true, direction:"right", offset:[8,0], className:"gemi-et"}).addTo(radarKat); gemiIz.set(k, m); }
+    m.setLatLng(n.ll); const el = m.getElement(); if (el) el.firstChild.style.transform = `rotate(${aci}deg)`;
+  }
+  const akt = new Set(ac.map(g => g.t + g.ad));
+  for (const [k, m] of gemiIz) if (!akt.has(k)) { radarKat.removeLayer(m); gemiIz.delete(k); }
+  let gs = 0, yl = 0; for (const g of KG) { if (g.t > rT) break; gs++; if (g.yon === "K") yl += g.kap; }
+  const $ = id => document.getElementById(id);
+  if (!$("rTar")) return;
+  const d = new Date(rT);
+  $("rTar").textContent = `${d.getDate()} ${AYLAR[d.getMonth()]} ${d.getFullYear()} · ${String(d.getHours()).padStart(2,"0")}:00`;
+  $("rGm").textContent = ac.length ? ac.map(g => `${g.ad} ${g.yon === "K" ? "İstanbul'a" : "Ege'ye"} gidiyor`).join(" · ") : "Boğaz'da şu an kruvaziyer yok";
+  $("rGs").textContent = sayi(gs); $("rYl").textContent = sayi(yl);
+  if (+$("rSl").value !== rT) $("rSl").value = rT;
+}
+function radarAdim(zaman){
+  if (!radarKat._map) return;
+  const dt = rSon ? Math.min(zaman - rSon, 100) / 1000 : 0; rSon = zaman;
+  if (rOyna) {
+    const yakin = KG.some(g => Math.abs(g.t - rT) < GECIS_SURE * 1.5);
+    rT += dt * (yakin ? 1.5 : 30) * 3600e3;          // gemi varken saniyede 1,5 saat; Boğaz boşken hızlı ileri
+    if (rT > R_SON) rT = R_BAS;
+  }
+  radarCiz(); rKare = requestAnimationFrame(radarAdim);
+}
+function radarBaslat(){
+  if (!KG.length || !document.getElementById("rOy")) return;
+  radarKat.addTo(map);
+  L.polyline(ROTA, {color:"#00354F", weight:1.5, opacity:.5, dashArray:"4 6", interactive:false}).addTo(radarKat);
+  const $ = id => document.getElementById(id);
+  $("rOy").onclick = () => { rOyna = !rOyna; $("rOy").textContent = rOyna ? "❚❚" : "▶"; $("rOy").setAttribute("aria-label", rOyna ? "Duraklat" : "Oynat"); };
+  $("rSl").oninput = e => { rT = +e.target.value; radarCiz(); };
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { rOyna = false; $("rOy").textContent = "▶"; }
+  cancelAnimationFrame(rKare); rSon = 0; rKare = requestAnimationFrame(radarAdim);
+}
+function radarDur(){ cancelAnimationFrame(rKare); radarKat.clearLayers(); gemiIz.clear(); radarKat.remove(); }
 function planPanel(){
   sekmeSec("plan"); ciz(PR); clearTimeout(gorZaman);
   const sira = [...BL.filter(b => BUYUKB.includes(b.no)), ...BL.filter(b => !BUYUKB.includes(b.no))];
-  ic.innerHTML = `<h2>Yönetim planı</h2>
+  ic.innerHTML = `${radarHTML()}${ozetHTML()}<h2>Yönetim planı: 12 bölüm</h2>
   <p class="say">Planın 12 bölümü. Harita planın altlığıdır: proje sahası ve projeler önde, Çanakkale'nin değerleri soluk zeminde.</p>
   ${ilerleme()}
   <div class="bento">${sira.map(b => {
@@ -554,7 +672,7 @@ function planPanel(){
   ic.querySelectorAll(".kt").forEach(k => k.onclick = () => { location.hash = "bolum-" + k.dataset.b; });
   ic.querySelectorAll("[data-h]").forEach(a => a.onclick = () => { location.hash = a.dataset.h; });
   sifirlaBagla(planPanel);
-  sahaGoster();
+  sahaGoster(); radarDur(); radarBaslat();
 }
 function bolumGoruldu(no, on){
   GOR.b = GOR.b.filter(x => x !== no); if (on) GOR.b.push(no); gorKaydet();
@@ -610,13 +728,13 @@ const H = window.HIKAYE, AZ = matchMedia("(prefers-reduced-motion: reduce)").mat
 const svgR = L.svg({padding:.6}); const hkKat = L.layerGroup();
 let hkI = -1, hkJeton = 0, hkRaf = [], hkOnceki = null;
 const SVG = {
-  kale:'<svg width="30" height="30" viewBox="0 0 30 30"><path d="M5 27V12h4V8h3v4h6V8h3v4h4v15z" fill="#5a3e1b" stroke="#f3ead6" stroke-width="1.6"/><path d="M13 27v-6a2 2 0 0 1 4 0v6" fill="#f3ead6"/></svg>',
+  kale:'<svg width="30" height="30" viewBox="0 0 30 30"><path d="M5 27V12h4V8h3v4h6V8h3v4h4v15z" fill="#8A6918" stroke="#ffffff" stroke-width="1.6"/><path d="M13 27v-6a2 2 0 0 1 4 0v6" fill="#ffffff"/></svg>',
   gemi:'<svg width="30" height="22" viewBox="0 0 30 22"><path d="M3 13h24l-4 6H7z" fill="currentColor" stroke="#fff" stroke-width="1.2"/><path d="M15 2v10M15 3l7 7h-7z" stroke="#fff" stroke-width="1.4" fill="#fff"/></svg>',
-  ordu:'<svg width="26" height="28" viewBox="0 0 26 28"><path d="M6 27V3" stroke="#2b2118" stroke-width="2"/><path d="M7 4h15l-4 5 4 5H7z" fill="currentColor" stroke="#fff" stroke-width="1.2"/></svg>',
+  ordu:'<svg width="26" height="28" viewBox="0 0 26 28"><path d="M6 27V3" stroke="#0A1114" stroke-width="2"/><path d="M7 4h15l-4 5 4 5H7z" fill="currentColor" stroke="#fff" stroke-width="1.2"/></svg>',
   asker:'<svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" stroke="#fff" stroke-width="2"/><path d="M7 13l5-4 5 4" stroke="#fff" stroke-width="2.4" fill="none"/></svg>',
   ok:'<svg width="22" height="22" viewBox="0 0 22 22"><path d="M11 2l8 16-8-4-8 4z" fill="currentColor" stroke="#fff" stroke-width="1.2"/></svg>',
   catisma:'<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#c8102e" stroke="#fff" stroke-width="2"/><path d="M9 9l12 12M21 9L9 21" stroke="#fff" stroke-width="3"/></svg>',
-  bayrak:'<svg width="28" height="30" viewBox="0 0 28 30"><path d="M5 29V3" stroke="#2b2118" stroke-width="2"/><path d="M6 4h19v13H6z" fill="#c8102e"/><circle cx="14" cy="10.5" r="4" fill="#fff"/><circle cx="15.4" cy="10.5" r="3.2" fill="#c8102e"/><path d="M19 8.6l.6 1.4 1.5.1-1.2 1 .4 1.5-1.3-.8-1.3.8.4-1.5-1.2-1 1.5-.1z" fill="#fff"/></svg>',
+  bayrak:'<svg width="28" height="30" viewBox="0 0 28 30"><path d="M5 29V3" stroke="#0A1114" stroke-width="2"/><path d="M6 4h19v13H6z" fill="#c8102e"/><circle cx="14" cy="10.5" r="4" fill="#fff"/><circle cx="15.4" cy="10.5" r="3.2" fill="#c8102e"/><path d="M19 8.6l.6 1.4 1.5.1-1.2 1 .4 1.5-1.3-.8-1.3.8.4-1.5-1.2-1 1.5-.1z" fill="#fff"/></svg>',
   mayin:'<svg width="26" height="26" viewBox="0 0 26 26"><g stroke="#111" stroke-width="2"><path d="M13 2v22M2 13h22M5 5l16 16M21 5L5 21"/></g><circle cx="13" cy="13" r="7" fill="#222" stroke="#fff" stroke-width="1.5"/></svg>',
   patlama:'<svg width="34" height="34" viewBox="0 0 34 34"><path d="M17 1l3 9 9-5-5 9 9 3-9 3 5 9-9-5-3 9-3-9-9 5 5-9-9-3 9-3-5-9 9 5z" fill="#ff8a00" stroke="#ffd58a" stroke-width="1.5"/></svg>'
 };
@@ -637,6 +755,11 @@ function vurgu(ll, renk){ L.circleMarker(ll,{renderer:svgR,radius:22,color:renk|
 async function eylem(a){
   const j=hkJeton;
   if (a.t==="rota") return rota(a);
+  if (a.t==="alan") { L.polygon(a.yol,{renderer:svgR,color:"#00354F",weight:1.5,dashArray:"5 5",fillColor:"#74C6EA",fillOpacity:.55,interactive:false}).addTo(hkKat);
+    if (a.etiket) { const c=L.polygon(a.yol).getBounds().getCenter(); etiket([c.lat,c.lng], a.etiket).addTo(hkKat); } return bekle(500); }
+  if (a.t==="daralan") { const y=a.yol, k=L.polygon(y,{renderer:svgR,color:"#00354F",weight:1.5,dashArray:"5 5",fillColor:"#74C6EA",fillOpacity:.55,interactive:false}).addTo(hkKat);
+    etiket([39.985,26.222],"alüvyon koyu dolduruyor").addTo(hkKat);
+    return canlan(a.sure||2600, t => k.setLatLngs(y.map(([la,lo]) => [la+(Math.max(la,a.kuzey)-la)*t*.92, lo]))); }
   if (a.t==="kale") { L.marker(a.yer,{icon:ikon("kale"),interactive:false}).addTo(hkKat); if (a.ad) etiket(a.yer, a.ad, 0, a.yon||"sag").addTo(hkKat); return bekle(500); }
   if (a.t==="bayrak") { L.marker([a.yer[0]+.01,a.yer[1]+.01],{icon:ikon("bayrak",null,28,30),interactive:false}).addTo(hkKat); if (a.ad) etiket([a.yer[0]-.014,a.yer[1]], a.ad).addTo(hkKat); return bekle(500); }
   if (a.t==="etiket") { etiket(a.yer, a.metin, a.buyuk).addTo(hkKat); return bekle(400); }
@@ -644,14 +767,14 @@ async function eylem(a){
   if (a.t==="catisma") { L.marker(a.yer,{icon:ikon("catisma"),interactive:false}).addTo(hkKat); vurgu(a.yer,"#c8102e"); if (a.ad) etiket([a.yer[0]-.03,a.yer[1]], a.ad).addTo(hkKat); return bekle(500); }
   if (a.t==="mayin") { L.marker(a.yer,{icon:ikon("mayin",null,26,26),interactive:false}).addTo(hkKat); vurgu(a.yer,"#ffd58a"); etiket([a.yer[0]-.012,a.yer[1]],"Erenköy Koyu mayın hattı").addTo(hkKat); return bekle(600); }
   if (a.t==="patlama") { for (const ll of a.yerler) { if (j!==hkJeton) return; L.marker(ll,{icon:ikon("patlama",null,34,34),interactive:false}).addTo(hkKat); await bekle(450); } return; }
-  if (a.t==="kopru") { const y=a.yol, k=L.polyline([y[0]],{renderer:svgR,color:"#6b4a2b",weight:9,dashArray:"3 5",opacity:.95}).addTo(hkKat); await canlan(2200, t => k.setLatLngs([y[0],[y[0][0]+(y[1][0]-y[0][0])*t, y[0][1]+(y[1][1]-y[0][1])*t]])); etiket([(y[0][0]+y[1][0])/2,(y[0][1]+y[1][1])/2+.03],"gemilerden köprü (yaklaşık)").addTo(hkKat); return; }
+  if (a.t==="kopru") { const y=a.yol, k=L.polyline([y[0]],{renderer:svgR,color:"#8A6918",weight:9,dashArray:"3 5",opacity:.95}).addTo(hkKat); await canlan(2200, t => k.setLatLngs([y[0],[y[0][0]+(y[1][0]-y[0][0])*t, y[0][1]+(y[1][1]-y[0][1])*t]])); etiket([(y[0][0]+y[1][0])/2,(y[0][1]+y[1][1])/2+.03],"gemilerden köprü (yaklaşık)").addTo(hkKat); return; }
   if (a.t==="kilit") { L.polyline(a.yol,{renderer:svgR,color:"#c8102e",weight:6,dashArray:"10 6",className:"hk-nabiz"}).addTo(hkKat); return bekle(400); }
   if (a.t==="tabyalar") { for (const [la,lo,ad] of a.yerler) { if (j!==hkJeton) return; L.marker([la,lo],{icon:ikon("kale",null,24,24),interactive:false}).addTo(hkKat); await bekle(180); } const ET={"Kilitbahir Kalesi":["sol",0.002],"Rumeli Mecidiye Tabyası":["sol",-0.004],"Seddülbahir Kalesi":["sol",0],"Çimenlik Kalesi":["sag",0.002],"Anadolu Hamidiye Tabyası":["sag",-0.004],"Orhaniye Tabyası":["sag",0],"Bigalı Kalesi":["sol",0]};
     a.yerler.filter(x => ET[x[2]]).forEach(([la,lo,ad]) => etiket([la+ET[ad][1],lo], ad, 0, ET[ad][0]).addTo(hkKat)); return; }
   if (a.t==="kapali") { a.yol.forEach(y => L.polyline(y,{renderer:svgR,color:"#c8102e",weight:6,className:"hk-nabiz"}).addTo(hkKat)); etiket([40.118,26.43],"kıyıda geçiş yok").addTo(hkKat); return bekle(400); }
-  if (a.t==="kordon") { for (const y of a.yol) { const d=yolUzunluk(y), k=L.polyline([y[0]],{renderer:svgR,color:"#0e7c86",weight:7}).addTo(hkKat); await canlan(2200, t => { const [la,lo,i]=yolNokta(y,d,t); k.setLatLngs(y.slice(0,i).concat([[la,lo]])); }); } etiket([40.12,26.43],"kesintisiz kordon").addTo(hkKat); return; }
-  if (a.t==="gemiler") { const y=a.yol, d=yolUzunluk(y), n=6, ms=[...Array(n)].map(()=>L.marker(y[0],{icon:ikon("gemi","#0e7c86"),interactive:false}).addTo(hkKat));
-    L.polyline(y,{renderer:svgR,color:"#0e7c86",weight:2,dashArray:"4 8",opacity:.6}).addTo(hkKat); etiket([40.02,26.12],"yılda ~600 bin kruvaziyer yolcusu (temsilî)").addTo(hkKat);
+  if (a.t==="kordon") { for (const y of a.yol) { const d=yolUzunluk(y), k=L.polyline([y[0]],{renderer:svgR,color:"#00354F",weight:7}).addTo(hkKat); await canlan(2200, t => { const [la,lo,i]=yolNokta(y,d,t); k.setLatLngs(y.slice(0,i).concat([[la,lo]])); }); } etiket([40.12,26.43],"kesintisiz kordon").addTo(hkKat); return; }
+  if (a.t==="gemiler") { const y=a.yol, d=yolUzunluk(y), n=6, ms=[...Array(n)].map(()=>L.marker(y[0],{icon:ikon("gemi","#00354F"),interactive:false}).addTo(hkKat));
+    L.polyline(y,{renderer:svgR,color:"#00354F",weight:2,dashArray:"4 8",opacity:.6}).addTo(hkKat); etiket([40.02,26.12],"yılda ~600 bin kruvaziyer yolcusu (temsilî)").addTo(hkKat);
     const t0=performance.now(); const f=now => { if (j!==hkJeton) return; ms.forEach((m,i) => { const t=((now-t0)/26000 + i/n) % 1; const [la,lo]=yolNokta(y,d,t); m.setLatLng([la,lo]); }); hkRaf.push(requestAnimationFrame(f)); };
     if (AZ) ms.forEach((m,i)=>{ const [la,lo]=yolNokta(y,d,i/n); m.setLatLng([la,lo]); }); else hkRaf.push(requestAnimationFrame(f)); return; }
   if (a.t==="son") { const b=document.createElement("button"); b.className="son"; b.textContent=a.metin; b.onclick=() => { hkKapat(); location.hash="plan"; }; document.querySelector("#hk .ctl").prepend(b); return; }
@@ -740,7 +863,7 @@ zcKur();
 async function hkGoster(i){
   const s=H.adimlar[i]; if (!s) return; hkI=i; const j=++hkJeton; hkRaf.forEach(cancelAnimationFrame); hkRaf=[]; hkKat.clearLayers();
   document.querySelectorAll("#hk .son").forEach(b => b.remove());
-  document.getElementById("hkBol").textContent = (s.b ? "Bölüm " + s.b + " · " : "") + H.bolumler[s.b];
+  document.getElementById("hkBol").textContent = "Bölüm " + (s.b + 1) + " · " + H.bolumler[s.b];
   document.getElementById("hkYil").textContent = s.yil; document.getElementById("hkOnce").textContent = zfark(s.z); zcIsaretle(i); document.getElementById("hkBas2").textContent = s.baslik; document.getElementById("hkMetin").textContent = s.metin;
   document.getElementById("hkNok").innerHTML = H.adimlar.map((_,k) => `<i class="${k===i?"on":""}"></i>`).join("");
   document.getElementById("hkGeri").disabled = i===0; document.getElementById("hkIleri").textContent = i===H.adimlar.length-1 ? "Bitir" : "İleri →";
@@ -771,7 +894,7 @@ function hikayeListe(){
   sekmeSec("hikaye"); ciz(PR);
   ic.innerHTML = `<p class="say">Boğaz'ın üç bin yılı, harita üstünde. İsteyen baştan izler, isteyen istediği bölümü açar.</p>
   <button class="hk-btn" id="hkBastan" style="margin-bottom:8px">Baştan izle</button>
-  ${H.bolumler.map((b,bi) => `<h3>${bi ? "Bölüm " + bi + ". " : ""}${esc(b)}</h3><ul class="pl">${H.adimlar.map((s,i) => [s,i]).filter(([s]) => s.b===bi).map(([s,i]) => `<li data-hk="${i}"><span class="nok" style="background:#c8102e"></span><div><div class="k">${esc(s.yil)}</div><div class="a">${esc(s.baslik)}</div></div></li>`).join("")}</ul>`).join("")}
+  ${H.bolumler.map((b,bi) => `<h3>${"Bölüm " + (bi + 1) + ". "}${esc(b)}</h3><ul class="pl">${H.adimlar.map((s,i) => [s,i]).filter(([s]) => s.b===bi).map(([s,i]) => `<li data-hk="${i}"><span class="nok" style="background:#c8102e"></span><div><div class="k">${esc(s.yil)}</div><div class="a">${esc(s.baslik)}</div></div></li>`).join("")}</ul>`).join("")}
   <h3>Bu topraklarda iz bırakanlar</h3><ul class="pl">${KS.map((k,i)=>[k,i]).sort((a,b)=>a[0].z[0]-b[0].z[0]).map(([k,i]) => `<li data-ki="${i}"><span class="nok" style="background:${krenk(k)}"></span><div><div class="k">${esc(k.tarih)} · ${esc(k.yer)}</div><div class="a">${esc(k.ad)}</div></div></li>`).join("")}</ul>
   <h3>Kaynaklar</h3><p style="font-size:14px">${H.kaynaklar.map(esc).join("<br>")}</p>
   <h3>Doğrulanacak ve yaklaşık olanlar</h3><p style="font-size:14px">${H.dogrulanacak.map(esc).join("<br>")}</p>`;
@@ -782,6 +905,7 @@ function hikayeListe(){
 
 function yonlendir(){
   const h = location.hash.slice(1);
+  radarDur();
   const okuma = h.startsWith("bolum-");
   if (okuma !== document.body.classList.contains("okuma")) { document.body.classList.toggle("okuma", okuma); setTimeout(() => map.invalidateSize(), 60); }
   if (h.startsWith("proje-")) return proje(h.slice(6));
