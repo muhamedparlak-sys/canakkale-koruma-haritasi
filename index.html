@@ -34,21 +34,32 @@ body.okuma main{grid-template-columns:min(660px,52vw) 1fr}
 .ilr .cb i{display:block;height:100%;background:var(--tunc);transition:width .4s ease}
 .ilr button{border:0;background:none;font:inherit;color:var(--mute);text-decoration:underline;cursor:pointer;padding:6px 0;min-height:32px}
 .radar{background:var(--gece);color:#fff;border-radius:10px;padding:14px 14px 12px;margin:0 0 18px;border-left:3px solid #E4C16C}
-.radar .rb{font-family:var(--fh);font-weight:800;font-size:12px;letter-spacing:.08em;color:#E4C16C;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.radar .rb{font-family:var(--fh);font-weight:800;font-size:14px;letter-spacing:.08em;color:#E4C16C;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .radar .rb i{width:8px;height:8px;border-radius:50%;background:#E4C16C;display:inline-block;margin-right:6px;animation:rnab 1.6s ease-in-out infinite}
 @keyframes rnab{50%{opacity:.25}}
 .radar .tar{font-family:var(--fh);font-weight:800;font-size:28px;line-height:1.1;margin-top:6px}
 .radar .gm{min-height:20px;font-size:14px;color:#D3D9DC;margin-top:2px}
 .radar .sy{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
-.radar .sy b{display:block;font-family:var(--fh);font-size:28px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
-.radar .sy span{font-size:11.5px;color:#AAB7BD}
+.radar .sy b{display:block;font-family:var(--fh);font-size:34px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.radar .sy span{font-size:14px;color:#D3D9DC}
 .radar .sy .in b{color:#FF5C70}
 .radar .ctl{display:flex;gap:8px;align-items:center;margin-top:10px}
 .radar input[type=range]{flex:1;accent-color:#E4C16C}
 .radar button{background:transparent;border:1px solid #E4C16C;color:#E4C16C;border-radius:6px;padding:3px 10px;font-weight:700;cursor:pointer;min-width:34px}
 .radar button:focus-visible{outline:2px solid #fff;outline-offset:2px}
-.radar .soz{font-family:var(--fh);font-weight:800;font-size:19px;line-height:1.2;margin:12px 0 0}
-.radar .not{font-size:11px;color:#AAB7BD;margin:8px 0 0;line-height:1.4}
+.radar .soz{font-family:var(--fh);font-weight:800;font-size:23px;line-height:1.2;margin:12px 0 0}
+.radar .not{font-size:13px;color:#C4CED2;margin:8px 0 0;line-height:1.4}
+.radar .lej{font-size:13px;color:#D3D9DC;margin:8px 0 0}
+.radar .kb{font-size:15px;color:#E6EBED;margin-top:10px}
+.radar .kb b{color:#E4C16C;font-family:var(--fh);font-size:18px}
+.radar .yl{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.radar .yl button{min-width:56px;font-family:var(--fh);font-size:16px;padding:4px 10px}
+.radar .yl button.on{background:#E4C16C;color:#0A1114}
+.radar .calis{margin-top:12px;border:1px solid #FF5C70;border-radius:8px;padding:9px 11px}
+.radar .calis b{display:block;font-family:var(--fh);font-size:20px;color:#FF5C70}
+.radar .calis span{font-size:15px;color:#E6EBED;line-height:1.45}
+.radar .calis ol{margin:6px 0 0;padding-left:20px;font-size:15px;color:#fff;line-height:1.4}
+.radar .sy .in b{font-size:26px}
 .ozet{margin:0 0 18px}
 .ozet .vz{font-family:var(--fh);font-size:19px;font-weight:700;line-height:1.25;color:var(--sea);margin:4px 0 12px;border-left:3px solid var(--tunc);padding-left:10px}
 .ozet .dg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
@@ -263,7 +274,6 @@ body.hk #panel{display:none}
 <script src="altlik.js"></script>
 <script src="hikaye.js"></script>
 <script src="bolumler.js"></script>
-<script src="kruz.js"></script>
 <script>
 {
 const D = window.PLAN, PR = D.projeler, IP = D.ip, KAT = window.KATMANLAR || [];
@@ -571,33 +581,42 @@ function gostergeHTML(b){
   return `<span class="al">${b.alt.length} alt bölüm</span>`;
 }
 
-/* ---- Açılış: Boğaz radarı + planın makro özeti (kullanıcı kararı 24.11.2026) ---- */
-/* Şematik geçiş rotası (Ege girişi → Çanakkale önü → Marmara); KORDON = kent önü */
+/* ---- Açılış: Boğaz radarı (yıllık, ~30 sn) + planın makro özeti (kullanıcı kararı 24.11.2026) ---- */
+/* Yıllık İstanbul kruvaziyer trafiği; gemilerin neredeyse tamamı Ege'den Çanakkale Boğazı'ndan gelip aynı yoldan döner (Plan 2.3.3) */
+const YILLAR = [
+  {yil:"2024", gemi:164, yolcu:400000, kaynak:"Galataport (Forbes Türkiye)"},
+  {yil:"2025", gemi:265, yolcu:625517, kaynak:"Ulaştırma ve Altyapı Bakanlığı (Plan 2.3.3)"},
+  {yil:"2026", gemi:119, yolcu:265369, kaynak:"İstanbul Liman Başkanlığı (Euronews)", not:"Ocak–Temmuz"},
+  /* 2027: CruiseMapper İstanbul tarifesinde 24.11.2026 itibarıyla görünen uğraklar (Ocak–Kasım), yolcu = gemilerin alt kapasitesi (portal/kruz.py girdisi) */
+  {yil:"2027", gemi:180, yolcu:388445, kaynak:"CruiseMapper tarifesi, 24.11.2026 itibarıyla", not:"tarifede görünen", ileri:true},
+];
+const HARCAMA = [60, 80];       // $/yolcu, günübirlik: liman işletmesi tahmini (Plan 2.3.3); Planlama Ekibi hesabı / VARSAYIM
+const YIL_SURE = 6500;          // her yıl 6,5 sn; dört yıl + özet ≈ 26 sn
 const ROTA = [[40.00,26.10],[40.03,26.19],[40.075,26.27],[40.115,26.345],[40.140,26.380],[40.160,26.395],[40.195,26.410],[40.235,26.445],[40.285,26.520],[40.330,26.585],[40.375,26.650],[40.415,26.715],[40.455,26.800]];
-const KORDON = [40.150, 26.395], GECIS_SURE = 4 * 3600e3;
 const rotaUz = (() => { const u = [0]; for (let i = 1; i < ROTA.length; i++) u.push(u[i-1] + Math.hypot(ROTA[i][0]-ROTA[i-1][0], (ROTA[i][1]-ROTA[i-1][1]) * .77)); return u; })();
-const rotaP = (() => { let en = 1e9, k = 0; ROTA.forEach((r, i) => { const d = Math.hypot(r[0]-KORDON[0], r[1]-KORDON[1]); if (d < en) { en = d; k = i; } }); return rotaUz[k] / rotaUz.at(-1); })();
 function rotaNokta(p){
   const Lp = p * rotaUz.at(-1); let i = 1; while (i < rotaUz.length - 1 && rotaUz[i] < Lp) i++;
   const t = (Lp - rotaUz[i-1]) / (rotaUz[i] - rotaUz[i-1] || 1), a = ROTA[i-1], b = ROTA[i];
   return {ll: [a[0] + (b[0]-a[0]) * t, a[1] + (b[1]-a[1]) * t], aci: Math.atan2((b[1]-a[1]) * .77, b[0]-a[0]) * 180 / Math.PI};
 }
-const KZ = window.KRUZ || {g: [], aralik: ["2026-11-24", "2027-11-23"]};
-const KG = KZ.g.map(([t, ad, kap, yon]) => ({t: Date.parse(t + ":00"), ad, kap: kap || 0, yon}));
-const R_BAS = Date.parse(KZ.aralik[0] + "T00:00:00"), R_SON = Date.parse(KZ.aralik[1] + "T23:59:00");
-const radarKat = L.layerGroup(), gemiIz = new Map();
-let rT = R_BAS, rOyna = true, rSon = 0, rKare = 0;
-const AYLAR = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const radarKat = L.layerGroup();
+let rKare = 0, rT0 = 0, rBitti = false;
 const sayi = n => Math.round(n).toLocaleString("tr-TR");
-const trTarih = s => s.split("-").reverse().join(".");
+const mUsd = n => (n / 1e6).toLocaleString("tr-TR", {maximumFractionDigits: 1}) + " milyon $";
+const mAra = n => (n * HARCAMA[0] / 1e6).toLocaleString("tr-TR", {maximumFractionDigits: 0}) + "–" + (n * HARCAMA[1] / 1e6).toLocaleString("tr-TR", {maximumFractionDigits: 0}) + " milyon $";
+const GECMIS = YILLAR.filter(y => !y.ileri), Y27 = YILLAR.find(y => y.ileri);
+const TOPLAM = GECMIS.reduce((t, y) => ({gemi: t.gemi + y.gemi, yolcu: t.yolcu + y.yolcu}), {gemi: 0, yolcu: 0});
 function radarHTML(){
   return `<section class="radar" aria-label="Boğaz radarı">
-    <div class="rb"><span><i></i>BOĞAZ RADARI · KRUVAZİYER GEÇİŞLERİ</span><span>${sayi(KZ.gemi||0)} gemi</span></div>
-    <div class="tar" id="rTar">—</div><div class="gm" id="rGm" aria-live="off"></div>
-    <div class="sy"><div><b id="rGs">0</b><span>gemi geçişi</span></div><div><b id="rYl">0</b><span>yolcu önünüzden geçti</span></div><div class="in"><b>%3</b><span>bugün Çanakkale'ye iniyor</span></div></div>
-    <div class="ctl"><button id="rOy" aria-label="Duraklat">❚❚</button><input type="range" id="rSl" min="${R_BAS}" max="${R_SON}" step="3600000" value="${rT}" aria-label="Tarih"></div>
-    <p class="soz">Su akar; yılda 600 bin yolcu kordonun önünden geçer. Yüzde üçü iner.</p>
-    <p class="not">Gemiler ve tarihler: ${esc(KZ.kaynak||"")}, ${trTarih(KZ.aralik[0])}–${trTarih(KZ.aralik[1])}. ${esc(KZ.varsayim||"")} Yolcu her uğrakta bir kez sayılır; rota şematiktir. Yıllık 600 bin yolcu tahmini 2025'te İstanbul'a uğrayan 265 gemi ve 625.517 yolcudan türetilmiştir; Kepez'e inen yaklaşık 20 bin yolcudur (Plan 2.3.3).</p>
+    <div class="rb"><span><i></i>BOĞAZ RADARI · ÖNÜNÜZDEN GEÇEN KRUVAZİYER</span><button id="rTekrar" aria-label="Baştan oynat">↻</button></div>
+    <div class="yl" id="rYil" role="tablist">${YILLAR.map((y, i) => `<button data-i="${i}">${y.yil}${y.not ? "*" : ""}</button>`).join("")}<button data-i="${YILLAR.length}">Özet</button></div>
+    <div class="kb">Kişi başı günübirlik harcama: <b>60–80 $</b></div>
+    <div class="sy"><div><b id="rGs">0</b><span>gemi</span></div><div><b id="rYl">0</b><span id="rYlE">yolcu önünüzden geçti</span></div><div class="in"><b id="rPr">0</b><span id="rPrE">kaçırılan ekonomik değer</span></div></div>
+    <p class="lej">Haritada her ok bir gemi; bir yılın gemileri 6,5 saniyede geçer.</p>
+    <p class="soz" id="rSoz">Su akar; gemi dolusu insan kordonun önünden geçer.</p>
+    <div class="calis"><b>Acil adım: Aralık 2026 sonu kruvaziyer toplantısı</b><span>Hatırlatma: 2027'de önünüzden en az ${sayi(Y27.yolcu)} yolcu geçecek; ekonomik değeri ${mAra(Y27.yolcu)}. ÇTSO kruvaziyer masasının ilk toplantısı (P-8); ana sorumlu ÇTSO, koordinasyon Valilik; masada Kepez Limanı işletmecisi, Belediye, İl Kültür ve Turizm Müdürlüğü ve acentalar.</span>
+      <ol><li>2027'de Kepez'e uğrayacak gemilere liman kapısında tek fiyatlı paket: Troya, müze, öğle yemeği, ulaşım (hızlı kazanım).</li><li>2028–2029 İstanbul seferlerine ilk ya da son gün Çanakkale uğrağı: rota satışı (rotalar 2–3 yıl önceden belirlenir).</li><li>Liman–kent–Troya arasında sabit fiyatlı, tarifeli bağlantı; gemi günleri için otobüs ve rehber havuzu.</li><li>Liman çıkışında ilan edilen sabit taksi ve transfer tarifesi.</li></ol></div>
+    <p class="not">İstanbul'a uğrayan gemi ve yolcu: ${YILLAR.map(y => `${y.yil}${y.not ? " (" + y.not + ")" : ""} ${esc(y.kaynak)}`).join("; ")}. Bu gemilerin neredeyse tamamı Çanakkale Boğazı'ndan gelip aynı yoldan döner; yolcu bir kez sayılır (Plan 2.3.3). Kaçırılan ekonomik değer: yolcu × kişi başı günübirlik harcama ${HARCAMA[0]}–${HARCAMA[1]} $ (Kepez liman işletmesi tahmini; Avrupa'da uğrak limanında yolcu başına 70–90 €, CLIA; Plan 2.3.3); Planlama Ekibi hesabı / VARSAYIM. Bugün Kepez'e inen yılda yaklaşık 20 bin yolcu, geçenin yaklaşık %3'ü. Rota şematiktir.</p>
   </section>`;
 }
 function ozetHTML(){
@@ -608,56 +627,65 @@ function ozetHTML(){
     <div class="am">
       <div><b>Gelibolu: korunarak daha çok kişiye</b><span>Önce koruma, anmanın niteliği ve güvenlik; ziyaret 2025'te ~5 milyon, 2030 önerisi 6 milyon.</span></div>
       <div><b>Kent, Troya, adalar, Kaz Dağları: kalış uzasın</b><span>Ortalama kalış 2025'te 1,79 gece, aylık doluluk %27.</span></div>
+      <div><b>Kruvaziyer: önünden geçen yolcu karaya insin</b><span>Bugün yılda ~20 bin yolcu iniyor; hedef 500 bin (Plan 2.3.3).</span></div>
     </div>
     <h3>İKİ SOMUT HEDEF</h3>
     <ol><li>Normandiya ile ilk sıradaki Gelibolu, bu yerini marka değerine dönüştürsün.</li><li>Çanakkale gecelemede Türkiye'nin ilk 10 ili arasına girsin.</li></ol>
     <p class="say"><span class="lnk" data-h="bolum-3">Vizyon ve hedefler: Bölüm 3 →</span> Aşağıdaki 12 bölüm bu hedeflere nasıl ulaşılacağını anlatır.</p>
   </section>`;
 }
-function radarCiz(){
-  const ac = [];
-  for (const g of KG) {
-    if (g.t < rT - GECIS_SURE * 1.2) continue; if (g.t > rT + GECIS_SURE * 1.2) break;
-    const p = rotaP + (rT - g.t) / GECIS_SURE * (g.yon === "K" ? 1 : -1);
-    if (p < 0 || p > 1) continue;
-    ac.push(g); const k = g.t + g.ad, n = rotaNokta(p), aci = g.yon === "K" ? n.aci : n.aci + 180;
-    let m = gemiIz.get(k);
-    if (!m) { m = L.marker(n.ll, {interactive:false, keyboard:false, icon: L.divIcon({className:"", html:`<div class="gemi"></div>`, iconSize:[12,16], iconAnchor:[6,8]})})
-      .bindTooltip(`${esc(g.ad)} · ${g.kap ? sayi(g.kap) + " yolcu" : "kapasite bilinmiyor"}`, {permanent:true, direction:"right", offset:[8,0], className:"gemi-et"}).addTo(radarKat); gemiIz.set(k, m); }
-    m.setLatLng(n.ll); const el = m.getElement(); if (el) el.firstChild.style.transform = `rotate(${aci}deg)`;
-  }
-  const akt = new Set(ac.map(g => g.t + g.ad));
-  for (const [k, m] of gemiIz) if (!akt.has(k)) { radarKat.removeLayer(m); gemiIz.delete(k); }
-  let gs = 0, yl = 0; for (const g of KG) { if (g.t > rT) break; gs++; if (g.yon === "K") yl += g.kap; }
-  const $ = id => document.getElementById(id);
-  if (!$("rTar")) return;
-  const d = new Date(rT);
-  $("rTar").textContent = `${d.getDate()} ${AYLAR[d.getMonth()]} ${d.getFullYear()} · ${String(d.getHours()).padStart(2,"0")}:00`;
-  $("rGm").textContent = ac.length ? ac.map(g => `${g.ad} ${g.yon === "K" ? "İstanbul'a" : "Ege'ye"} gidiyor`).join(" · ") : "Boğaz'da şu an kruvaziyer yok";
-  $("rGs").textContent = sayi(gs); $("rYl").textContent = sayi(yl);
-  if (+$("rSl").value !== rT) $("rSl").value = rT;
+/* Her yıl: o yılın gemileri 8 sn içinde Boğaz'dan akar (bir simge = bir uğrak), sayaçlar sıfırdan dolar */
+const gemiSimge = () => L.marker(ROTA[0], {interactive:false, keyboard:false, icon: L.divIcon({className:"", html:`<div class="gemi"></div>`, iconSize:[12,16], iconAnchor:[6,8]})});
+let filo = [];
+function filoKur(i){
+  radarKat.clearLayers(); filo = [];
+  L.polyline(ROTA, {color:"#00354F", weight:1.5, opacity:.5, dashArray:"4 6", interactive:false}).addTo(radarKat);
+  if (i >= YILLAR.length) return;
+  const n = YILLAR[i].gemi;
+  for (let k = 0; k < n; k++) filo.push({m: gemiSimge(), bas: (k / n) * (YIL_SURE - 2200), yon: k % 2 ? -1 : 1, ekli: false});
 }
+function radarGoster(i, t){
+  const $ = id => document.getElementById(id); if (!$("rGs")) return;
+  const top = i >= YILLAR.length, y = top ? TOPLAM : YILLAR[i], f = top ? 1 : Math.min(1, t / (YIL_SURE - 1500));
+  const e = 1 - Math.pow(1 - f, 3);
+  $("rYlE").textContent = !top && y.ileri ? "yolcu önünüzden geçecek" : "yolcu önünüzden geçti";
+  $("rPrE").textContent = !top && y.ileri ? "önünüzden geçecek ekonomik değer" : "kaçırılan ekonomik değer";
+  $("rGs").textContent = sayi(y.gemi * e); $("rYl").textContent = sayi(y.yolcu * e); $("rPr").textContent = mAra(y.yolcu * e);
+  document.querySelectorAll("#rYil button").forEach(b => b.classList.toggle("on", +b.dataset.i === i));
+  $("rSoz").textContent = top
+    ? `${GECMIS[0].yil}–${GECMIS.at(-1).yil}: ${sayi(TOPLAM.yolcu)} yolcu önünüzden geçti; kaçırılan ekonomik değer ${mAra(TOPLAM.yolcu)}. 2027'de en az ${sayi(Y27.yolcu)} yolcu daha geçecek.`
+    : y.ileri ? `2027: tarifede şimdiden ${sayi(y.gemi)} gemi, en az ${sayi(y.yolcu)} yolcu. Rotalar 2–3 yıl önceden belirlenir; 2027'de kazanç, Kepez'e zaten uğrayan gemilerin yolcusunu karaya indirmekten gelir.`
+    : `${y.yil}${y.not ? " (" + y.not + ")" : ""}: ${sayi(y.gemi)} gemi dolusu insan kordonun önünden geçti; dönüp bakmadık.`;
+  if (top) return;
+  for (const g of filo) {
+    const p = (t - g.bas) / 2200;
+    if (p < 0 || p > 1) { if (g.ekli) { radarKat.removeLayer(g.m); g.ekli = false; } continue; }
+    if (!g.ekli) { g.m.addTo(radarKat); g.ekli = true; }
+    const n = rotaNokta(g.yon > 0 ? p : 1 - p); g.m.setLatLng(n.ll);
+    const el = g.m.getElement(); if (el) el.firstChild.style.transform = `rotate(${g.yon > 0 ? n.aci : n.aci + 180}deg)`;
+  }
+}
+let rI = -1;
 function radarAdim(zaman){
   if (!radarKat._map) return;
-  const dt = rSon ? Math.min(zaman - rSon, 100) / 1000 : 0; rSon = zaman;
-  if (rOyna) {
-    const yakin = KG.some(g => Math.abs(g.t - rT) < GECIS_SURE * 1.5);
-    rT += dt * (yakin ? 1.5 : 30) * 3600e3;          // gemi varken saniyede 1,5 saat; Boğaz boşken hızlı ileri
-    if (rT > R_SON) rT = R_BAS;
-  }
-  radarCiz(); rKare = requestAnimationFrame(radarAdim);
+  if (!rT0) rT0 = zaman;
+  const gecen = zaman - rT0, i = Math.min(Math.floor(gecen / YIL_SURE), YILLAR.length);
+  if (i !== rI) { rI = i; filoKur(i); }
+  radarGoster(i, gecen - i * YIL_SURE);
+  if (i < YILLAR.length) rKare = requestAnimationFrame(radarAdim); else rBitti = true;
 }
+function radarOynat(bas){ cancelAnimationFrame(rKare); rI = -1; rBitti = false; rT0 = 0; rKare = requestAnimationFrame(z => { rT0 = z - bas * YIL_SURE; radarAdim(z); }); }
 function radarBaslat(){
-  if (!KG.length || !document.getElementById("rOy")) return;
+  if (!document.getElementById("rGs")) return;
   radarKat.addTo(map);
-  L.polyline(ROTA, {color:"#00354F", weight:1.5, opacity:.5, dashArray:"4 6", interactive:false}).addTo(radarKat);
-  const $ = id => document.getElementById(id);
-  $("rOy").onclick = () => { rOyna = !rOyna; $("rOy").textContent = rOyna ? "❚❚" : "▶"; $("rOy").setAttribute("aria-label", rOyna ? "Duraklat" : "Oynat"); };
-  $("rSl").oninput = e => { rT = +e.target.value; radarCiz(); };
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { rOyna = false; $("rOy").textContent = "▶"; }
-  cancelAnimationFrame(rKare); rSon = 0; rKare = requestAnimationFrame(radarAdim);
+  document.getElementById("rTekrar").onclick = () => radarOynat(0);
+  document.querySelectorAll("#rYil button").forEach(b => b.onclick = () => {
+    const i = +b.dataset.i; if (i >= YILLAR.length) { cancelAnimationFrame(rKare); rI = i; filoKur(i); radarGoster(i, 0); } else radarOynat(i);
+  });
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { rI = YILLAR.length; filoKur(rI); radarGoster(rI, 0); return; }
+  radarOynat(0);
 }
-function radarDur(){ cancelAnimationFrame(rKare); radarKat.clearLayers(); gemiIz.clear(); radarKat.remove(); }
+function radarDur(){ cancelAnimationFrame(rKare); radarKat.clearLayers(); filo = []; radarKat.remove(); }
 function planPanel(){
   sekmeSec("plan"); ciz(PR); clearTimeout(gorZaman);
   const sira = [...BL.filter(b => BUYUKB.includes(b.no)), ...BL.filter(b => !BUYUKB.includes(b.no))];
