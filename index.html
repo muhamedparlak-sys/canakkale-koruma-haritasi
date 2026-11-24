@@ -22,6 +22,13 @@ html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--ink);font:15px/1.5 Figtree,system-ui,sans-serif;overflow:hidden}
 header{height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--gece);color:#fff;border-bottom:2px solid var(--tunc)}
 header h1{font-family:var(--fh);font-size:22px;font-weight:800;letter-spacing:.01em;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header .taslak{font:800 12px var(--fh);letter-spacing:.14em;padding:3px 9px;border:1.5px dashed var(--tunc);color:var(--tunc);border-radius:6px;white-space:nowrap}
+header .yz{display:inline-flex}header .yz .hk-btn{padding:6px 9px;border-radius:0;font-weight:700}header .yz .hk-btn:first-child{border-radius:8px 0 0 8px;border-right:0}header .yz .hk-btn:last-child{border-radius:0 8px 8px 0}
+#panel{zoom:var(--yz,1)}
+body.haritasiz main{grid-template-columns:1fr}
+body.haritasiz #map{display:none}
+body.haritasiz #panel{border-right:0}
+body.haritasiz #panel .ic,body.haritasiz #panel .sek{width:100%;max-width:860px;margin-left:auto;margin-right:auto}
 .rozet{font-size:12.5px;padding:3px 9px;border-radius:99px;background:var(--red);color:#fff;white-space:nowrap}
 header .sag{margin-left:auto;display:flex;gap:8px;align-items:center}
 header .hk-btn{white-space:nowrap;background:transparent;color:#fff;border-color:rgba(255,255,255,.45)}
@@ -55,6 +62,8 @@ body.okuma main{grid-template-columns:min(660px,52vw) 1fr}
 .radar .yl{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
 .radar .yl button{min-width:56px;font-family:var(--fh);font-size:16px;padding:4px 10px}
 .radar .yl button.on{background:#E4C16C;color:#0A1114}
+.radar .yl button.ileri{border-style:dashed}
+.radar .yl button.ileri.on{background:transparent;color:#E4C16C;border-width:2px}
 .radar .calis{margin-top:12px;border:1px solid #FF5C70;border-radius:8px;padding:9px 11px}
 .radar .calis b{display:block;font-family:var(--fh);font-size:20px;color:#FF5C70}
 .radar .calis span{font-size:15px;color:#E6EBED;line-height:1.45}
@@ -70,7 +79,24 @@ body.okuma main{grid-template-columns:min(660px,52vw) 1fr}
 .ozet .am span{font-size:13px;color:var(--mute)}
 .ozet ol{margin:0 0 6px;padding-left:20px;font-size:14px}
 .ozet h3{font-size:15px;margin:12px 0 6px;letter-spacing:.04em;color:var(--tunc)}
-.gemi{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:16px solid #FF5C70;filter:drop-shadow(0 0 4px rgba(255,92,112,.9))}
+.gemi.hayal{opacity:.5;filter:none}
+.gemi.kp path{fill:#FF5C70;stroke:#C8102E}
+#rSay{position:absolute;right:12px;bottom:28px;z-index:600;width:min(300px,46%);max-height:62%;overflow:hidden;background:rgba(255,255,255,.94);border:1px solid #D3D9DC;border-radius:12px;padding:10px 12px;box-shadow:0 6px 18px rgba(0,0,0,.14);font:14px/1.35 Figtree,sans-serif;color:#0A1114;display:none}
+body.sade #rSay.on{display:block}
+#rSay b{font:800 22px "Sofia Sans Condensed","Arial Narrow",sans-serif;color:#00354F}
+#rSay .k{color:#C8102E}
+#rSay .iz{display:flex;flex-wrap:wrap;gap:2px;margin-top:6px}
+#rSay .iz i{width:5px;height:11px;border-radius:3px 3px 1px 1px;background:#00354F}
+#rSay .iz i.kp{background:#E4405A}
+#rSay .iz.hayal i{background:none;border:1px dashed #00354F}
+#rSay small{display:block;color:#475459;margin-top:6px;font-size:12px}
+.radar .kpz{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:15px;color:#E6EBED}
+.radar .kpz .gemi{transform:rotate(90deg);filter:none}
+.gemi.hayal path{fill:none;stroke-dasharray:2 2}
+.gemi{width:9px;height:23px;filter:drop-shadow(0 1px 2px rgba(0,53,79,.45))}
+.gemi svg{display:block}
+.sade-et{width:max-content;transform:translate(-50%,-50%);font:600 13px Figtree,sans-serif;color:#00354F;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 6px #fff;pointer-events:none;white-space:nowrap}
+.sade-et.b{font:800 15px "Sofia Sans Condensed","Arial Narrow",sans-serif;letter-spacing:.06em;color:#475459}
 .leaflet-tooltip.gemi-et{background:rgba(10,17,20,.88);color:#fff;border:0;font:600 12px Figtree,sans-serif;padding:2px 6px;box-shadow:none}
 .leaflet-tooltip.gemi-et:before{display:none}
 .bento{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -241,6 +267,8 @@ body.hk #panel{display:none}
  #hk{left:8px;right:8px;bottom:8px;width:auto;padding:12px 14px 10px}#hk h2{font-size:18px}#hk p{font-size:15px}
  header{gap:8px;padding:0 10px}header h1{font-size:17px}#surum .uz{display:none}@media(max-width:440px){#surum{display:none}}header .hk-btn{padding:6px 10px}
  main,body.okuma main{grid-template-columns:1fr;grid-template-rows:42% 58%}
+ body.haritasiz main{grid-template-rows:1fr}#panel{grid-row:auto}
+ header .taslak{font-size:10px;padding:2px 6px}#surum{display:none}header .sag{gap:5px}header .sag .hk-btn{font-size:12.5px;padding:5px 7px}header .uz{display:none}
  #map{grid-row:1}#panel{grid-row:2;border-right:0;border-top:1px solid var(--line)}
 }
 </style>
@@ -248,8 +276,12 @@ body.hk #panel{display:none}
 <body>
 <header>
   <h1>Çanakkale Turizm Yönetim Planı</h1>
+  <span class="taslak" title="Plan henüz taslak aşamasındadır">TASLAK</span>
   <span class="rozet" id="surum">v0.9</span>
-  <span class="sag"><button class="hk-btn" id="hkBas">Hikâyeyi izle</button></span>
+  <span class="sag">
+    <span class="yz" role="group" aria-label="Yazı boyutu"><button class="hk-btn" id="yzKuc" aria-label="Yazıyı küçült">A−</button><button class="hk-btn" id="yzBuy" aria-label="Yazıyı büyüt">A+</button></span>
+    <button class="hk-btn" id="hrBtn" aria-pressed="false">Haritayı kapat</button>
+    <button class="hk-btn" id="hkBas">Hikâye<span class="uz">yi izle</span></button></span>
 </header>
 <main>
   <aside id="panel">
@@ -324,6 +356,21 @@ const BUYUK = /^(Büyük proje sahası|Geniş planlama sahası)/;
 /* Görülenler: bölümler ve haritada açılan yerler; yalnız bu tarayıcıda saklanır */
 const GKEY = "ctp_gorulen";
 let GOR = {b:[], y:[]};
+/* Yazı boyutu ve harita aç/kapa: tercih bu tarayıcıda saklanır */
+const YZ = [.9, 1, 1.12, 1.25, 1.4];
+let yzI = 1; try { const k = +localStorage.getItem("ctp_yz"); if (YZ.includes(k)) yzI = YZ.indexOf(k); } catch(e) {}
+function yzUygula(){ document.documentElement.style.setProperty("--yz", YZ[yzI]); document.getElementById("yzKuc").disabled = yzI === 0; document.getElementById("yzBuy").disabled = yzI === YZ.length - 1; try { localStorage.setItem("ctp_yz", YZ[yzI]); } catch(e) {} }
+document.getElementById("yzKuc").onclick = () => { if (yzI > 0) { yzI--; yzUygula(); } };
+document.getElementById("yzBuy").onclick = () => { if (yzI < YZ.length - 1) { yzI++; yzUygula(); } };
+yzUygula();
+function haritaKapali(k){
+  document.body.classList.toggle("haritasiz", k);
+  const b = document.getElementById("hrBtn"); b.textContent = k ? "Haritayı aç" : "Haritayı kapat"; b.setAttribute("aria-pressed", k);
+  try { localStorage.setItem("ctp_haritasiz", k ? "1" : ""); } catch(e) {}
+  if (!k) setTimeout(() => map.invalidateSize(), 30);
+}
+document.getElementById("hrBtn").onclick = () => haritaKapali(!document.body.classList.contains("haritasiz"));
+try { if (localStorage.getItem("ctp_haritasiz")) haritaKapali(true); } catch(e) {}
 try { GOR = Object.assign(GOR, JSON.parse(localStorage.getItem(GKEY) || "{}")); } catch(e) {}
 const gorKaydet = () => { try { localStorage.setItem(GKEY, JSON.stringify(GOR)); } catch(e) {} };
 const halkaKat = L.layerGroup().addTo(map);
@@ -349,7 +396,7 @@ katman.forEach(g => g.eachLayer(l => { if (GOR.y.includes(l._k)) halkaCiz(l); })
 const esik = k => k.grup==="Proje" ? 9 : /tabya|Askerî/.test(k.ad) ? 11 : k.grup.startsWith("Tescilli") ? 14 : k.grup==="Üst koruma" ? 9 : 12;
 const etiketKat = L.layerGroup().addTo(map);
 function etiketleriCiz(){
-  etiketKat.clearLayers(); if (document.body.classList.contains("hk")) return;
+  etiketKat.clearLayers(); if (document.body.classList.contains("hk") || document.body.classList.contains("sade")) return;
   const z = map.getZoom(), b = map.getBounds().pad(0.1);
   etiketler.forEach(e => { if (z < esik(e.k) || !map.hasLayer(katman[e.i]) || (solukMu && SOLUK.has(e.i))) return;
     const c = e.l.getLatLng ? e.l.getLatLng() : e.l.getBounds().getCenter(); if (!b.contains(c)) return;
@@ -375,7 +422,7 @@ function soluk(on){
     l.setStyle(on ? SOLUK_ST : l._ilk); }));
 }
 function katmanUygula(){
-  if (document.body.classList.contains("hk")) return;
+  if (document.body.classList.contains("hk") || document.body.classList.contains("sade")) return;
   const kor = sekme === "koruma", pl = sekme === "plan", set = kor ? korumaAcik : pl ? planSeti : planAcik;
   katman.forEach((l,i) => set.has(i) ? l.addTo(map) : map.removeLayer(l));
   soluk(pl);
@@ -581,42 +628,57 @@ function gostergeHTML(b){
   return `<span class="al">${b.alt.length} alt bölüm</span>`;
 }
 
-/* ---- Açılış: Boğaz radarı (yıllık, ~30 sn) + planın makro özeti (kullanıcı kararı 24.11.2026) ---- */
-/* Yıllık İstanbul kruvaziyer trafiği; gemilerin neredeyse tamamı Ege'den Çanakkale Boğazı'ndan gelip aynı yoldan döner (Plan 2.3.3) */
+/* ---- Açılış: Boğaz radarı (yıllık, ~60 sn; her simge bir gemi) + planın makro özeti (kullanıcı kararları 24.11.2026) ---- */
+/* İstanbul limanlarına uğrayan kruvaziyer gemileri; neredeyse tamamı Ege'den Çanakkale Boğazı'ndan gelip aynı yoldan döner (Plan 2.3.3).
+   Geçmiş yıllar resmî sayı; 2027–2028 CruiseMapper tarifesinde 24.11.2026 itibarıyla görünen uğraklar (yolcu = alt kapasite; portal/girdi/kruz). */
 const YILLAR = [
-  {yil:"2024", gemi:164, yolcu:400000, kaynak:"Galataport (Forbes Türkiye)"},
+  {yil:"2022", gemi:143, yolcu:220082, kaynak:"Ulaştırma ve Altyapı Bakanlığı (Bloomberg HT)"},
+  {yil:"2023", gemi:225, yolcu:402729, kaynak:"Ulaştırma ve Altyapı Bakanlığı (haberler.com)"},
+  {yil:"2024", gemi:184, yolcu:402226, kaynak:"Ulaştırma ve Altyapı Bakanlığı (DHA)", not:"Ocak–Ekim"},
   {yil:"2025", gemi:265, yolcu:625517, kaynak:"Ulaştırma ve Altyapı Bakanlığı (Plan 2.3.3)"},
   {yil:"2026", gemi:119, yolcu:265369, kaynak:"İstanbul Liman Başkanlığı (Euronews)", not:"Ocak–Temmuz"},
-  /* 2027: CruiseMapper İstanbul tarifesinde 24.11.2026 itibarıyla görünen uğraklar (Ocak–Kasım), yolcu = gemilerin alt kapasitesi (portal/kruz.py girdisi) */
-  {yil:"2027", gemi:180, yolcu:388445, kaynak:"CruiseMapper tarifesi, 24.11.2026 itibarıyla", not:"tarifede görünen", ileri:true},
+  {yil:"2027", gemi:188, yolcu:403745, kaynak:"CruiseMapper tarifesi", ileri:true},
+  {yil:"2028", gemi:83, yolcu:137894, kaynak:"CruiseMapper tarifesi", ileri:true, not:"tarife dolmadı"},
 ];
 const HARCAMA = 100;            // $/yolcu, günübirlik: planın hedef harcaması (Plan 2.3.3; kullanıcı kararı 24.11.2026); Planlama Ekibi hesabı / VARSAYIM
-const YIL_SURE = 6500;          // her yıl 6,5 sn; dört yıl + özet ≈ 26 sn
+const KEPEZ_ORAN = 40 / 265;    // 2025'te Kepez'e ~40 gemi, İstanbul'a 265 (Plan 2.3.3); diğer yıllara aynı oran (VARSAYIM)
+const GECIS = 3200;             // bir geminin ekranda Boğaz'ı geçişi (ms)
+const ARA = {gecmis: 32, ileri: 22};   // iki gemi arası (ms); üç şerit → şerit başına bunun üç katı
+const yilSure = y => Math.round(y.gemi * (y.ileri ? ARA.ileri : ARA.gecmis) + GECIS + 700);
+const YBAS = (() => { const b = [0]; YILLAR.forEach(y => b.push(b.at(-1) + yilSure(y))); return b; })();   // yılların başlangıç anları
 const ROTA = [[40.00,26.10],[40.03,26.19],[40.075,26.27],[40.115,26.345],[40.140,26.380],[40.160,26.395],[40.195,26.410],[40.235,26.445],[40.285,26.520],[40.330,26.585],[40.375,26.650],[40.415,26.715],[40.455,26.800]];
-const rotaUz = (() => { const u = [0]; for (let i = 1; i < ROTA.length; i++) u.push(u[i-1] + Math.hypot(ROTA[i][0]-ROTA[i-1][0], (ROTA[i][1]-ROTA[i-1][1]) * .77)); return u; })();
-function rotaNokta(p){
-  const Lp = p * rotaUz.at(-1); let i = 1; while (i < rotaUz.length - 1 && rotaUz[i] < Lp) i++;
-  const t = (Lp - rotaUz[i-1]) / (rotaUz[i] - rotaUz[i-1] || 1), a = ROTA[i-1], b = ROTA[i];
+const KEPEZ_YOL = [[40.00,26.10],[40.03,26.19],[40.075,26.27],[40.092,26.335],[40.097,26.378]];
+function yolHesap(Y){ const u = [0]; for (let i = 1; i < Y.length; i++) u.push(u[i-1] + Math.hypot(Y[i][0]-Y[i-1][0], (Y[i][1]-Y[i-1][1]) * .77)); return u; }
+const rotaUz = yolHesap(ROTA), kepezUz = yolHesap(KEPEZ_YOL);
+function yolNoktasi(Y, U, p){
+  const Lp = p * U.at(-1); let i = 1; while (i < U.length - 1 && U[i] < Lp) i++;
+  const t = (Lp - U[i-1]) / (U[i] - U[i-1] || 1), a = Y[i-1], b = Y[i];
   return {ll: [a[0] + (b[0]-a[0]) * t, a[1] + (b[1]-a[1]) * t], aci: Math.atan2((b[1]-a[1]) * .77, b[0]-a[0]) * 180 / Math.PI};
 }
+function seritNokta(p, kay){
+  const n = yolNoktasi(ROTA, rotaUz, p), r = n.aci * Math.PI / 180;   // rotaya dik kaydırma (iki paralel şerit, ikisi de İstanbul'a)
+  return {ll: [n.ll[0] - Math.sin(r) * kay, n.ll[1] + Math.cos(r) * kay / .77], aci: n.aci};
+}
 const radarKat = L.layerGroup();
-let rKare = 0, rT0 = 0, rBitti = false;
+let rKare = 0, rT0 = 0;
 const sayi = n => Math.round(n).toLocaleString("tr-TR");
-const mUsd = n => (n / 1e6).toLocaleString("tr-TR", {maximumFractionDigits: 1}) + " milyon $";
 const mAra = n => (n * HARCAMA / 1e6).toLocaleString("tr-TR", {maximumFractionDigits: 1}) + " milyon $";
-const GECMIS = YILLAR.filter(y => !y.ileri), Y27 = YILLAR.find(y => y.ileri);
-const TOPLAM = GECMIS.reduce((t, y) => ({gemi: t.gemi + y.gemi, yolcu: t.yolcu + y.yolcu}), {gemi: 0, yolcu: 0});
+const GECMIS = YILLAR.filter(y => !y.ileri), ILERI = YILLAR.filter(y => y.ileri), Y27 = ILERI[0];
+const topla = L => L.reduce((t, y) => ({gemi: t.gemi + y.gemi, yolcu: t.yolcu + y.yolcu}), {gemi: 0, yolcu: 0});
+const TOPLAM = topla(GECMIS), TOPLAM_I = topla(ILERI);
+const kepezSay = y => Math.round(y.gemi * KEPEZ_ORAN);
 function radarHTML(){
   return `<section class="radar" aria-label="Boğaz radarı">
     <div class="rb"><span><i></i>BOĞAZ RADARI · ÖNÜNÜZDEN GEÇEN KRUVAZİYER</span><button id="rTekrar" aria-label="Baştan oynat">↻</button></div>
-    <div class="yl" id="rYil" role="tablist">${YILLAR.map((y, i) => `<button data-i="${i}">${y.yil}${y.not ? "*" : ""}</button>`).join("")}<button data-i="${YILLAR.length}">Özet</button></div>
+    <div class="yl" id="rYil" role="tablist">${YILLAR.map((y, i) => `<button data-i="${i}"${y.ileri ? ' class="ileri"' : ""}>${y.yil}${y.ileri ? " beklenen" : y.not ? " · " + y.not : ""}</button>`).join("")}<button data-i="${YILLAR.length}">Özet</button></div>
+    <p class="lej" id="rLej"></p>
     <div class="kb">Kişi başı günübirlik harcama: <b>${HARCAMA} $</b> · bugün Gelibolu turu yemek, rehber ve ulaşım dahil ~24 $</div>
     <div class="sy"><div><b id="rGs">0</b><span>gemi</span></div><div><b id="rYl">0</b><span id="rYlE">yolcu önünüzden geçti</span></div><div class="in"><b id="rPr">0</b><span id="rPrE">kaçırılan ekonomik değer</span></div></div>
-    <p class="lej">Haritada her ok bir gemi; bir yılın gemileri 6,5 saniyede geçer.</p>
+    <div class="kpz"><span class="gemi kp">${GEMI_SVG}</span><span id="rKp">Kepez'e uğrayan</span></div>
     <p class="soz" id="rSoz">Su akar; gemi dolusu insan kordonun önünden geçer.</p>
-    <div class="calis"><b>Acil adım: Aralık 2026 sonu kruvaziyer toplantısı</b><span>Hatırlatma: 2027'de önünüzden en az ${sayi(Y27.yolcu)} yolcu geçecek; ekonomik değeri ${mAra(Y27.yolcu)}. ÇTSO kruvaziyer masasının ilk toplantısı (P-8); ana sorumlu ÇTSO, koordinasyon Valilik; masada Kepez Limanı işletmecisi, Belediye, İl Kültür ve Turizm Müdürlüğü ve acentalar.</span>
+    <div class="calis"><b>Acil adım: Aralık 2026 sonu kruvaziyer toplantısı</b><span>Hatırlatma: 2027'de önünüzden en az ${sayi(Y27.yolcu)} yolcu geçecek; ekonomik değeri ${mAra(Y27.yolcu)}. ÇTSO kruvaziyer masasının ilk toplantısı (P-8); ana sorumlu ÇTSO, koordinasyon Valilik; masada Kepez Limanı işletmecisi, Belediye, İl Kültür ve Turizm Müdürlüğü ve acentalar. ÇTSO'nun Kasım 2026 seçiminden çıkan yeni yönetiminin ilk icraatı olarak duyurulması önerilir.</span>
       <ol><li>2027'de Kepez'e uğrayacak gemilere liman kapısında tek fiyatlı paket: Troya, müze, öğle yemeği, ulaşım (hızlı kazanım).</li><li>2028–2029 İstanbul seferlerine ilk ya da son gün Çanakkale uğrağı: rota satışı (rotalar 2–3 yıl önceden belirlenir).</li><li>Liman–kent–Troya arasında sabit fiyatlı, tarifeli bağlantı; gemi günleri için otobüs ve rehber havuzu.</li><li>Liman çıkışında ilan edilen sabit taksi ve transfer tarifesi.</li></ol></div>
-    <p class="not">İstanbul'a uğrayan gemi ve yolcu: ${YILLAR.map(y => `${y.yil}${y.not ? " (" + y.not + ")" : ""} ${esc(y.kaynak)}`).join("; ")}. Bu gemilerin neredeyse tamamı Çanakkale Boğazı'ndan gelip aynı yoldan döner; yolcu bir kez sayılır (Plan 2.3.3). Kaçırılan ekonomik değer: yolcu × kişi başı günübirlik harcama ${HARCAMA} $ (planın hedef harcaması: yemek, hediyelik eşya ve müze girişi; Plan 2.3.3); Planlama Ekibi hesabı / VARSAYIM. Bugün acentaların Gelibolu Yarımadası turu yemek, rehber ve ulaşım dahil kişi başı yaklaşık 24 $: proje ekibi bilgisi (Kasım 2026). Bugün Kepez'e inen yılda yaklaşık 20 bin yolcu, geçenin yaklaşık %3'ü. Rota şematiktir.</p>
+    <p class="not">Haritadaki her simge gerçek bir kruvaziyer uğrağıdır: o yıl İstanbul limanlarına uğrayan gemi sayısı kadar simge geçer. Gemiler aynı yoldan döner; dönüşleri ayrıca gösterilmez, yolcu bir kez sayılır (Plan 2.3.3). Gemi ve yolcu: ${YILLAR.map(y => `${y.yil}${y.not ? " (" + y.not + ")" : ""} ${esc(y.kaynak)}`).join("; ")}; 2027–2028 tarifede 24.11.2026 itibarıyla görünen uğraklar, yolcu = gemilerin alt kapasitesi. Kırmızı simgeler Kepez'e uğrayan gemilerdir: 2025'te yaklaşık 40 gemi (Plan 2.3.3); diğer yıllar aynı oranla, yaklaşık. Kaçırılan ekonomik değer: yolcu × kişi başı günübirlik harcama ${HARCAMA} $ (planın hedef harcaması: yemek, hediyelik eşya ve müze girişi); Planlama Ekibi hesabı / VARSAYIM. Gelibolu turu ~24 $ ve ÇTSO yönetim seçimi: proje ekibi bilgisi (Kasım 2026). Rota şematiktir.</p>
   </section>`;
 }
 function ozetHTML(){
@@ -634,50 +696,89 @@ function ozetHTML(){
     <p class="say"><span class="lnk" data-h="bolum-3">Vizyon ve hedefler: Bölüm 3 →</span> Aşağıdaki 12 bölüm bu hedeflere nasıl ulaşılacağını anlatır.</p>
   </section>`;
 }
-/* Her yıl: o yılın gemileri 8 sn içinde Boğaz'dan akar (bir simge = bir uğrak), sayaçlar sıfırdan dolar */
-const gemiSimge = () => L.marker(ROTA[0], {interactive:false, keyboard:false, icon: L.divIcon({className:"", html:`<div class="gemi"></div>`, iconSize:[12,16], iconAnchor:[6,8]})});
+/* Her yıl: o yılın her gemisi bir simge olarak Ege'den İstanbul'a akar; Kepez'e uğrayanlar kırmızı, limana döner ve durur */
+const GEMI_SVG = `<svg viewBox="0 0 10 26" width="9" height="23" aria-hidden="true"><path d="M5 0C8 4 9.5 8 9.5 12V24.5Q9.5 26 8 26H2Q.5 26 .5 24.5V12C.5 8 2 4 5 0Z" fill="#fff" stroke="#00354F" stroke-width="1.2"/><rect x="3" y="11" width="4" height="8" rx="1" fill="#00354F"/></svg>`;
+const gemiSimge = (hayal, kepez) => L.marker(ROTA[0], {interactive:false, keyboard:false, icon: L.divIcon({className:"", html:`<div class="gemi${hayal ? " hayal" : ""}${kepez ? " kp" : ""}">${GEMI_SVG}</div>`, iconSize:[9,23], iconAnchor:[4,11]})});
 let filo = [];
+function sayacKur(i){
+  let k = document.getElementById("rSay");
+  if (!k) { k = document.createElement("div"); k.id = "rSay"; k.setAttribute("aria-live", "off"); document.getElementById("map").appendChild(k); }
+  k.classList.toggle("on", i >= 0 && i < YILLAR.length); if (!(i >= 0 && i < YILLAR.length)) return;
+  const y = YILLAR[i];
+  k.innerHTML = `<div><b id="rSayN">0</b> gemi ${y.ileri ? "geçecek" : "geçti"} · <span class="k"><span id="rSayK">0</span> tanesi Kepez'e uğradı</span></div><div class="iz${y.ileri ? " hayal" : ""}" id="rSayIz"></div><small>Her çizgi gerçek bir gemi${y.ileri ? " (tarifede)" : ""}; kırmızılar Kepez'e uğrayanlar.</small>`;
+}
 function filoKur(i){
-  radarKat.clearLayers(); filo = [];
-  L.polyline(ROTA, {color:"#00354F", weight:1.5, opacity:.5, dashArray:"4 6", interactive:false}).addTo(radarKat);
+  radarKat.clearLayers(); filo = []; sayacKur(i);
+  L.polyline(ROTA, {color:"#00354F", weight:2, opacity:.35, dashArray:"2 8", lineCap:"round", interactive:false}).addTo(radarKat);
   if (i >= YILLAR.length) return;
-  const n = YILLAR[i].gemi;
-  for (let k = 0; k < n; k++) filo.push({m: gemiSimge(), bas: (k / n) * (YIL_SURE - 2200), yon: k % 2 ? -1 : 1, ekli: false});
+  const y = YILLAR[i], n = y.gemi, hayal = !!y.ileri, ara = y.ileri ? ARA.ileri : ARA.gecmis, kp = kepezSay(y);
+  for (let k = 0; k < n; k++) {
+    const kepez = kp > 0 && k % Math.max(1, Math.round(n / kp)) === 0 && filo.filter(g => g.kepez).length < kp;
+    filo.push({m: gemiSimge(hayal, kepez), bas: k * ara, kay: (k % 3 - 1) * .0034, kepez, ekli: false});
+  }
 }
 function radarGoster(i, t){
   const $ = id => document.getElementById(id); if (!$("rGs")) return;
-  const top = i >= YILLAR.length, y = top ? TOPLAM : YILLAR[i], f = top ? 1 : Math.min(1, t / (YIL_SURE - 1500));
-  const e = 1 - Math.pow(1 - f, 3);
+  const top = i >= YILLAR.length, y = top ? TOPLAM : YILLAR[i];
+  const f = top ? 1 : Math.min(1, t / Math.max(1, yilSure(y) - GECIS - 700)), e = f;
+  $("rLej").textContent = top ? `Özet: son beş yıl ve tarifede görünen iki yıl.`
+    : y.ileri ? `${y.yil}: kesik çizgili simgeler tarifede görünen, henüz geçmemiş gemiler. Her simge bir gemi.`
+    : `${y.yil}: her simge o yıl gerçekten geçen bir gemi. Gemiler aynı yoldan döner.`;
   $("rYlE").textContent = !top && y.ileri ? "yolcu önünüzden geçecek" : "yolcu önünüzden geçti";
   $("rPrE").textContent = !top && y.ileri ? "önünüzden geçecek ekonomik değer" : "kaçırılan ekonomik değer";
   $("rGs").textContent = sayi(y.gemi * e); $("rYl").textContent = sayi(y.yolcu * e); $("rPr").textContent = mAra(y.yolcu * e);
+  $("rKp").textContent = top ? `Kepez'e uğrayan: 2025'te yaklaşık 40 gemi, geçenin yaklaşık %3'ü yolcu`
+    : `Kepez'e uğrayan: yaklaşık ${sayi(kepezSay(y) * e)} gemi${y.yil === "2025" ? "" : " (2025 oranıyla)"}`;
   document.querySelectorAll("#rYil button").forEach(b => b.classList.toggle("on", +b.dataset.i === i));
   $("rSoz").textContent = top
-    ? `${GECMIS[0].yil}–${GECMIS.at(-1).yil}: ${sayi(TOPLAM.yolcu)} yolcu önünüzden geçti; kaçırılan ekonomik değer ${mAra(TOPLAM.yolcu)}. 2027'de en az ${sayi(Y27.yolcu)} yolcu daha geçecek.`
-    : y.ileri ? `2027: tarifede şimdiden ${sayi(y.gemi)} gemi, en az ${sayi(y.yolcu)} yolcu. Rotalar 2–3 yıl önceden belirlenir; 2027'de kazanç, Kepez'e zaten uğrayan gemilerin yolcusunu karaya indirmekten gelir.`
+    ? `${GECMIS[0].yil}–${GECMIS.at(-1).yil}: ${sayi(TOPLAM.gemi)} gemi, ${sayi(TOPLAM.yolcu)} yolcu önünüzden geçti; kaçırılan ekonomik değer ${mAra(TOPLAM.yolcu)}. 2027–2028 tarifesinde şimdiden ${sayi(TOPLAM_I.gemi)} gemi, en az ${sayi(TOPLAM_I.yolcu)} yolcu var.`
+    : y.ileri ? `${y.yil}: tarifede şimdiden ${sayi(y.gemi)} gemi, en az ${sayi(y.yolcu)} yolcu${y.not ? " (" + y.not + ")" : ""}. Bu yıl henüz gelmedi.`
     : `${y.yil}${y.not ? " (" + y.not + ")" : ""}: ${sayi(y.gemi)} gemi dolusu insan kordonun önünden geçti; dönüp bakmadık.`;
   if (top) return;
   for (const g of filo) {
-    const p = (t - g.bas) / 2200;
-    if (p < 0 || p > 1) { if (g.ekli) { radarKat.removeLayer(g.m); g.ekli = false; } continue; }
+    const p = (t - g.bas) / (g.kepez ? GECIS * .55 : GECIS);
+    const bitis = g.kepez ? 1 + 1200 / (GECIS * .55) : 1;     // Kepez'de 1,2 sn durur
+    if (!g.sayildi && p >= 1) { g.sayildi = true; const iz = document.getElementById("rSayIz");
+      if (iz) { const c = document.createElement("i"); if (g.kepez) c.className = "kp"; iz.appendChild(c);
+        const n = document.getElementById(g.kepez ? "rSayK" : "rSayN"); n.textContent = +n.textContent + 1;
+        if (g.kepez) { const t = document.getElementById("rSayN"); t.textContent = +t.textContent + 1; } } }
+    if (p < 0 || p > bitis) { if (g.ekli) { radarKat.removeLayer(g.m); g.ekli = false; } continue; }
     if (!g.ekli) { g.m.addTo(radarKat); g.ekli = true; }
-    const n = rotaNokta(g.yon > 0 ? p : 1 - p); g.m.setLatLng(n.ll);
-    const el = g.m.getElement(); if (el) el.firstChild.style.transform = `rotate(${g.yon > 0 ? n.aci : n.aci + 180}deg)`;
+    const n = g.kepez ? yolNoktasi(KEPEZ_YOL, kepezUz, Math.min(p, 1)) : seritNokta(p, g.kay);
+    g.m.setLatLng(n.ll);
+    const el = g.m.getElement(); if (el) el.firstChild.style.transform = `rotate(${n.aci}deg)`;
   }
 }
 let rI = -1;
 function radarAdim(zaman){
   if (!radarKat._map) return;
   if (!rT0) rT0 = zaman;
-  const gecen = zaman - rT0, i = Math.min(Math.floor(gecen / YIL_SURE), YILLAR.length);
+  const gecen = zaman - rT0; let i = 0; while (i < YILLAR.length && gecen >= YBAS[i + 1]) i++;
   if (i !== rI) { rI = i; filoKur(i); }
-  radarGoster(i, gecen - i * YIL_SURE);
-  if (i < YILLAR.length) rKare = requestAnimationFrame(radarAdim); else rBitti = true;
+  radarGoster(i, gecen - YBAS[i]);
+  if (i < YILLAR.length) rKare = requestAnimationFrame(radarAdim);
 }
-function radarOynat(bas){ cancelAnimationFrame(rKare); rI = -1; rBitti = false; rT0 = 0; rKare = requestAnimationFrame(z => { rT0 = z - bas * YIL_SURE; radarAdim(z); }); }
+function radarOynat(bas){ cancelAnimationFrame(rKare); rI = -1; rT0 = 0; rKare = requestAnimationFrame(z => { rT0 = z - YBAS[bas]; radarAdim(z); }); }
+let sadeOnceki = null;
+const SADE_ET = [[40.152,26.43,"Çanakkale",0],[40.097,26.42,"Kepez Limanı",0],[39.985,26.255,"Troya",0],[40.06,25.98,"EGE",1],[40.50,26.92,"MARMARA · İstanbul'a",1]];
+function sadeAc(){
+  if (!document.body.classList.contains("sade")) { sadeOnceki = altlikSimdi(); altlikSec(kampanya); }
+  document.body.classList.add("sade");
+  [projeKat, halkaKat, ...katman].forEach(l => map.removeLayer(l)); etiketKat.clearLayers(); map.closePopup();
+  const i = KAT.findIndex(k => /^Büyük proje sahası \(taslak\)/.test(k.ad)); if (i >= 0) katman[i].addTo(map);
+  SADE_ET.forEach(([la, lo, ad, b]) => L.marker([la, lo], {interactive:false, keyboard:false, icon: L.divIcon({className:"", html:`<div class="sade-et${b ? " b" : ""}">${esc(ad)}</div>`, iconSize:null})}).addTo(sadeKat));
+  sadeKat.addTo(map);
+  map.flyToBounds([[39.96,25.98],[40.50,26.90]], {padding:[12,12], duration:.6});
+}
+function sadeKapat(){
+  if (!document.body.classList.contains("sade")) return;
+  document.body.classList.remove("sade"); sadeKat.clearLayers(); sadeKat.remove();
+  altlikSec(sadeOnceki || uydu); halkaKat.addTo(map); katmanUygula();
+}
+const sadeKat = L.layerGroup();
 function radarBaslat(){
   if (!document.getElementById("rGs")) return;
-  radarKat.addTo(map);
+  sadeAc(); radarKat.addTo(map);
   document.getElementById("rTekrar").onclick = () => radarOynat(0);
   document.querySelectorAll("#rYil button").forEach(b => b.onclick = () => {
     const i = +b.dataset.i; if (i >= YILLAR.length) { cancelAnimationFrame(rKare); rI = i; filoKur(i); radarGoster(i, 0); } else radarOynat(i);
@@ -685,7 +786,7 @@ function radarBaslat(){
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) { rI = YILLAR.length; filoKur(rI); radarGoster(rI, 0); return; }
   radarOynat(0);
 }
-function radarDur(){ cancelAnimationFrame(rKare); radarKat.clearLayers(); filo = []; radarKat.remove(); }
+function radarDur(){ cancelAnimationFrame(rKare); radarKat.clearLayers(); filo = []; radarKat.remove(); sayacKur(-1); sadeKapat(); }
 function planPanel(){
   sekmeSec("plan"); ciz(PR); clearTimeout(gorZaman);
   const sira = [...BL.filter(b => BUYUKB.includes(b.no)), ...BL.filter(b => !BUYUKB.includes(b.no))];
@@ -700,7 +801,7 @@ function planPanel(){
   ic.querySelectorAll(".kt").forEach(k => k.onclick = () => { location.hash = "bolum-" + k.dataset.b; });
   ic.querySelectorAll("[data-h]").forEach(a => a.onclick = () => { location.hash = a.dataset.h; });
   sifirlaBagla(planPanel);
-  sahaGoster(); radarDur(); radarBaslat();
+  radarDur(); radarBaslat();
 }
 function bolumGoruldu(no, on){
   GOR.b = GOR.b.filter(x => x !== no); if (on) GOR.b.push(no); gorKaydet();
@@ -905,6 +1006,7 @@ async function hkGoster(i){
 }
 function hkBaslat(i=0){
   if (!document.body.classList.contains("hk")) { hkOnceki = altlikSimdi(); altlikSec(kampanya); }
+  if (document.body.classList.contains("haritasiz")) haritaKapali(false);
   document.body.classList.add("hk"); zcKur(); map.invalidateSize(); [projeKat, halkaKat, ...katman].forEach(l => map.removeLayer(l)); etiketKat.clearLayers(); map.closePopup(); hkKat.addTo(map); hkGoster(i);
 }
 function hkKapat(){
