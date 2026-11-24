@@ -1,171 +1,660 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Çanakkale Koruma Haritası</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<title>Çanakkale Turizm Yönetim Planı</title>
+<meta name="description" content="Çanakkale koruma haritası, Boğaz'ın hikâyesi ve turizm yönetim planının projeleri tek haritada.">
+<link rel="stylesheet" href="leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800&family=Sofia+Sans+Condensed:wght@600;800&display=swap">
 <style>
-  :root { --bg:#f6f4ef; --ink:#1d1d1b; --mute:#6b675f; --line:#d9d4c7; --panel:#fffdf8; }
-  * { box-sizing: border-box; }
-  html, body { margin:0; height:100%; font:14px/1.35 system-ui, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
-  #map { position:absolute; inset:0 0 0 340px; }
-  #panel { position:absolute; top:0; left:0; bottom:0; width:340px; overflow:auto; background:var(--panel); border-right:1px solid var(--line); padding:14px 14px 40px; }
-  h1 { font-size:17px; margin:0 0 4px; }
-  .alt { color:var(--mute); font-size:12px; margin-bottom:10px; }
-  #ara { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; font:inherit; margin-bottom:6px; }
-  #sonuc { max-height:180px; overflow:auto; font-size:12.5px; }
-  #sonuc div { padding:4px 6px; cursor:pointer; border-bottom:1px solid #eee; }
-  #sonuc div:hover { background:#f1ede2; }
-  .grup { margin-top:12px; border-top:1px solid var(--line); padding-top:8px; }
-  .grup > label { font-weight:600; display:flex; gap:6px; align-items:center; }
-  .kat { display:flex; gap:7px; align-items:center; padding:3px 0 3px 18px; font-size:13px; }
-  .kat span.n { color:var(--mute); font-size:11.5px; margin-left:auto; }
-  .sw { width:14px; height:14px; border-radius:3px; flex:none; border:1px solid rgba(0,0,0,.35); }
-  .sw.cz { height:4px; border:none; }
-  .sw.kz { height:0; border-top:3px dashed; background:none !important; }
-  .altlik { margin-top:10px; font-size:13px; display:flex; gap:12px; }
-  .leaflet-popup-content { font-size:12.5px; max-height:260px; overflow:auto; }
-  .leaflet-popup-content b { display:block; margin-bottom:4px; font-size:13.5px; }
-  .leaflet-popup-content td { padding:1px 6px 1px 0; vertical-align:top; }
-  .leaflet-popup-content td:first-child { color:var(--mute); white-space:nowrap; }
-  .etk { color:#fff; font-size:11.5px; font-weight:600; white-space:nowrap; transform:translate(-50%,-50%); pointer-events:none;
-         text-shadow:0 0 3px #000, 0 0 3px #000, 0 0 2px #000; }
-  .etk.buyuk { font-size:13.5px; color:#ffeb3b; }
-  body.acik .etk { color:#1d1d1b; text-shadow:0 0 3px #fff, 0 0 3px #fff, 0 0 2px #fff; }
-  body.acik .etk.buyuk { color:#b71c1c; }
-  @media (max-width: 760px) {
-    #panel { width:100%; bottom:auto; height:46%; border-right:none; border-bottom:1px solid var(--line); padding:12px 16px 30px; }
-    #map { inset:46% 0 0 0; }
-  }
+/* VOICE: kamu projesi kayıt defteri; sakin, kesin, resmî.
+   IDEA: Boğaz'ın pafta defteri: her proje haritada bir iz, yanında künyesi.
+   PICTURE: haritanın kendisi; projeler misyon renkleriyle çizilmiş.
+   COLOUR and TYPE: beyaz zemin, Boğaz laciverti-yeşili mürekkep, tek kırmızı vurgu; Figtree.
+   LAYOUT: solda künye paneli, sağda tam boy harita; telefonda üstte harita, altta panel. */
+/* Marka: _plan_kaynak/marka/tokens.json (Çanakkale Turizm Yönetim Planı tasarım sistemi) */
+:root{color-scheme:light dark;--bg:light-dark(#FFFFFF,#060B0E);--ink:light-dark(#0A1114,#FFFFFF);--mute:light-dark(#475459,#AAB7BD);--line:light-dark(#D3D9DC,#26333A);--soft:light-dark(#F2F4F5,#0F171B);--sea:light-dark(#00354F,#74C6EA);--sea-on:light-dark(#FFFFFF,#03131B);--red:light-dark(#C8102E,#FF5C70);--tunc:light-dark(#8A6918,#E4C16C);--deniz:light-dark(#DCEAF0,#0E2531);--gece:light-dark(#0A1114,#000000);--fh:"Sofia Sans Condensed","Arial Narrow",sans-serif}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 Figtree,system-ui,sans-serif;overflow:hidden}
+header{height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--gece);color:#fff;border-bottom:2px solid var(--tunc)}
+header h1{font-family:var(--fh);font-size:22px;font-weight:800;letter-spacing:.01em;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rozet{font-size:12.5px;padding:3px 9px;border-radius:99px;background:var(--red);color:#fff;white-space:nowrap}
+header .sag{margin-left:auto;display:flex;gap:8px;align-items:center}
+header .hk-btn{white-space:nowrap;background:transparent;color:#fff;border-color:rgba(255,255,255,.45)}
+header .hk-btn:hover{background:rgba(255,255,255,.12)}
+main{position:absolute;top:56px;bottom:0;left:0;right:0;display:grid;grid-template-columns:400px 1fr}
+#panel{overflow:auto;border-right:1px solid var(--line);display:flex;flex-direction:column}
+#map{height:100%;background:var(--deniz)}
+nav.sek{flex:none;display:flex;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5;overflow-x:auto}
+nav.sek button{flex:1 0 auto;border:0;background:none;font:inherit;font-weight:600;color:var(--mute);padding:12px 12px;min-height:44px;cursor:pointer;border-bottom:3px solid transparent}
+nav.sek button:hover{color:var(--ink)}
+nav.sek button.on{color:var(--sea);border-bottom-color:var(--sea)}
+.ic{flex:none;padding:14px 16px 40px}
+input[type=search],select{width:100%;font:inherit;font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);min-height:44px}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+h2,h3{font-family:var(--fh)}
+.leaflet-control-layers-toggle{background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%2300354F%27 stroke-width=%272%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M12 3l9 5-9 5-9-5z%27/%3E%3Cpath d=%27M3 13l9 5 9-5%27/%3E%3C/svg%3E")!important;background-size:24px 24px!important}
+/* Koruma kipi */
+#sonuc{max-height:240px;overflow:auto;font-size:13.5px;margin:4px 0 8px}
+#sonuc div{padding:7px 6px;cursor:pointer;border-bottom:1px solid var(--line)}
+#sonuc div:hover{background:var(--soft)}
+#sonuc .ky{color:var(--tunc)}
+.grup{margin-top:10px;border-top:1px solid var(--line);padding-top:6px}
+.grup>label{font-weight:600;display:flex;gap:8px;align-items:center;min-height:36px}
+.grup .kat label{padding-left:18px}
+.kat .n{color:var(--mute);font-size:12px;margin-left:auto}
+.sw.cz{height:4px;border-radius:0}
+.sw.kz{height:0;border-top:3px dashed;background:none!important;border-radius:0}
+.ayar{display:flex;gap:8px;align-items:center;font-size:14px;min-height:40px}
+.leaflet-popup-content{font:12.5px/1.4 Figtree,sans-serif;max-height:260px;overflow:auto}
+.leaflet-popup-content b{display:block;margin-bottom:4px;font-size:13.5px}
+.leaflet-popup-content td{padding:1px 6px 1px 0;vertical-align:top;border:0}
+.leaflet-popup-content td:first-child{color:#475459;white-space:nowrap}
+.etk{color:#fff;font-size:11.5px;font-weight:600;white-space:nowrap;transform:translate(-50%,-50%);pointer-events:none;text-shadow:0 0 3px #000,0 0 3px #000,0 0 2px #000}
+body.acik .etk{color:#0A1114;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff}
+.suz{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 10px}
+.say{color:var(--mute);font-size:13px;margin:4px 0 8px}
+.pl{list-style:none;margin:0;padding:0}
+.pl li{display:grid;grid-template-columns:14px 1fr;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.pl li:hover{background:var(--soft)}
+.nok{width:12px;height:12px;border-radius:50%;margin-top:4px}
+.pl .k{font-size:12.5px;color:var(--mute)}
+.pl .a{font-weight:600}
+.geri{border:0;background:none;font:inherit;color:var(--sea);cursor:pointer;padding:8px 0;min-height:44px;font-weight:600}
+h2{font-size:24px;line-height:1.15;margin:4px 0 12px;text-wrap:balance}
+h3{font-size:15px;margin:22px 0 8px}
+.kunye{display:grid;grid-template-columns:8.5em 1fr;gap:6px 12px;background:var(--soft);border-radius:10px;padding:12px 14px;font-size:14px}
+.kunye dt{color:var(--mute)}.kunye dd{margin:0}
+.etiket{display:inline-block;font-size:12.5px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);margin:0 4px 4px 0;color:var(--mute)}
+.uyari{font-size:13px;color:var(--mute);border-left:3px solid var(--red);padding:2px 0 2px 10px;margin:12px 0}
+a{color:var(--sea)}
+.lnk{cursor:pointer;color:var(--sea);text-decoration:underline;text-underline-offset:2px}
+.kat label{display:flex;gap:8px;align-items:center;padding:6px 0;font-size:14px;min-height:36px}
+.kat .sw{width:14px;height:14px;border-radius:3px;flex:none}
+.leg{display:grid;gap:4px;font-size:13px;margin-top:8px}
+.leg span{display:flex;gap:8px;align-items:center}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+td,th{text-align:left;padding:6px 6px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.leaflet-container{font:inherit}
+.leaflet-tooltip{font:13px Figtree,sans-serif}
+.hk-btn{border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-weight:600;border-radius:99px;padding:6px 14px;min-height:36px;cursor:pointer}
+#hk{position:absolute;left:16px;bottom:16px;width:min(460px,calc(100% - 32px));z-index:1000;background:rgba(10,17,20,.9);color:#fff;border-top:2px solid #E4C16C;border-radius:14px;padding:16px 18px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none;backdrop-filter:blur(4px)}
+body.hk #hk{display:block}
+#zc{position:absolute;left:12px;right:12px;top:12px;z-index:1001;background:#fff;color:#0A1114;border:1px solid #D3D9DC;border-radius:14px;padding:10px 16px 8px;box-shadow:0 6px 20px rgba(0,0,0,.18);display:none;user-select:none}
+body.hk #zc{display:block}
+#zc .ust{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:13px;color:#475459;min-height:20px}
+#zc .ust b{font-family:"Sofia Sans Condensed","Arial Narrow",sans-serif;font-size:20px;font-weight:800;color:#00354F}
+#zc .ust .on{color:#0A1114;font-weight:600}
+#zc .iz{position:relative;height:66px;margin-top:4px;cursor:pointer;touch-action:none}
+#zc .cag{position:absolute;top:20px;height:16px;border-radius:4px;font-size:11.5px;line-height:16px;padding:0 6px;overflow:hidden;white-space:nowrap;color:#0A1114;background:#F2F4F5;border:1px solid #D3D9DC;box-sizing:border-box}
+#zc .cag.t{background:#E8E3D7}
+#zc .hat{position:absolute;left:0;right:0;top:47px;height:2px;background:#00354F;opacity:.35}
+#zc .ad{position:absolute;top:41px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#fff;border:2.5px solid #00354F;box-sizing:border-box;padding:0;cursor:pointer}
+#zc .ad.ar{border-radius:7px;height:14px;margin-left:0;background:#DCEAF0}
+#zc .ad.on{background:#8A6918;border-color:#8A6918;transform:scale(1.25)}
+#zc .ad.ar.on{background:#8A6918;opacity:.9}
+#zc .aral{position:absolute;top:42px;height:12px;border-radius:6px;background:#8A6918;opacity:.28;transition:left .45s ease,width .45s ease;pointer-events:none}
+#zc .imle{position:absolute;top:36px;width:3px;height:26px;margin-left:-1.5px;background:#8A6918;border-radius:2px;transition:left .45s ease;pointer-events:none}
+#zc .cpa{position:absolute;top:56px;font-size:10.5px;color:#475459;white-space:nowrap;transform:translateX(-50%);pointer-events:none}
+#zc .cpa.bas{transform:none}#zc .cpa.son{transform:translateX(-100%)}#zc .cpa.bas:before{left:0}#zc .cpa.son:before{left:100%}
+body.hk .leaflet-top{top:172px}
+@media (max-width:760px){body.hk .leaflet-top{top:172px}}
+#zc .cpa:before{content:"";position:absolute;left:50%;top:-5px;width:1px;height:4px;background:#475459}
+#zc .not{font-size:11px;color:#475459;text-align:right;margin-top:2px}
+
+#zc .ks{position:absolute;top:0;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:#fff;border:1.5px solid #8A6918;display:grid;place-items:center;padding:0;cursor:pointer;color:#8A6918}
+#zc .ks svg{width:12px;height:12px}
+#zc .ks.on{background:#8A6918;color:#fff}
+#zc .ks b{position:absolute;right:-7px;top:-6px;background:#00354F;color:#fff;font-size:9.5px;line-height:13px;min-width:13px;border-radius:7px;padding:0 2px}
+#zcKart{display:none;margin-top:8px;border-top:1px solid #D3D9DC;padding-top:8px;font-size:13.5px;line-height:1.45;max-height:34vh;overflow:auto}
+#zcKart.ac{display:block}
+#zcKart .bas{display:flex;gap:10px;align-items:center}
+#zcKart .ki{width:30px;height:30px;border-radius:50%;background:#8A6918;color:#fff;display:grid;place-items:center;flex:none}
+#zcKart .ki svg{width:18px;height:18px}
+#zcKart h4{margin:0;font-size:15px;color:#0A1114}
+#zcKart .alt{color:#475459;font-size:12.5px}
+#zcKart p{margin:6px 0 4px}
+#zcKart .kay{font-size:11.5px;color:#475459}
+#zcKart .sat{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+#zcKart button{border:1px solid #D3D9DC;background:#fff;color:#00354F;border-radius:8px;font:inherit;font-weight:600;font-size:12.5px;padding:5px 10px;cursor:pointer;min-height:32px}
+#zcKart ul{margin:4px 0;padding:0;list-style:none}
+#zcKart li{padding:4px 0;border-bottom:1px solid #F2F4F5;cursor:pointer}
+#zcKart li:hover{color:#00354F}
+.kisi-ik{width:30px;height:30px;border-radius:50%;background:#8A6918;color:#fff;display:grid;place-items:center;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.kisi-ik svg{width:17px;height:17px}
+#hk .once{font-size:14px;color:#E4C16C;margin-top:2px}
+@media (max-width:760px){#zc .cpa.k{display:none} #zc .not,#zc .ust .sira{display:none} #zc{padding:8px 12px 4px} #zc .cag{font-size:10px} #zc .ust b{font-size:17px}}
+@media (prefers-reduced-motion:reduce){#zc .aral{position:absolute;top:42px;height:12px;border-radius:6px;background:#8A6918;opacity:.28;transition:left .45s ease,width .45s ease;pointer-events:none}
+#zc .imle{transition:none}}
+
+#hk .yil{font-family:var(--fh);font-size:clamp(30px,4vw,44px);font-weight:800;line-height:1.05;color:#E4C16C}
+#hk .bol{font-size:13px;color:#AAB7BD;margin-bottom:2px}
+#hk h2{color:#fff;font-size:23px;margin:6px 0 6px}
+#hk p{margin:0 0 10px;font-size:15.5px;line-height:1.5}
+#hk .ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#hk button{background:#fff;color:#0A1114;border:0;border-radius:8px;font:inherit;font-weight:700;padding:8px 14px;min-height:40px;cursor:pointer}
+#hk button.ik{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35)}
+#hk .nok2{display:flex;gap:4px;margin-left:auto}
+#hk .nok2 i{width:7px;height:7px;border-radius:50%;background:#475459;display:block}
+#hk .nok2 i.on{background:#E4C16C}
+#hk .son{background:#C8102E;color:#fff}
+body.hk #map{grid-column:1/-1}
+body.hk #panel{display:none}
+.hk-et{width:max-content;color:#2b2118;font-weight:800;font-size:13px;white-space:nowrap;text-shadow:0 0 3px #f3ead6,0 0 3px #f3ead6,0 0 6px #f3ead6;transform:translate(-50%,-50%);pointer-events:none}
+.hk-et.b{font-size:26px;color:#5a3e1b;opacity:.85}
+.hk-et.sag{transform:translate(8px,-50%)}.hk-et.sol{transform:translate(calc(-100% - 8px),-50%)}
+.hk-ik{filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+.hk-pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.hk-nabiz{animation:nabiz 1.3s ease-in-out infinite}
+@keyframes nabiz{0%,100%{stroke-opacity:.95;stroke-width:6}50%{stroke-opacity:.35;stroke-width:10}}
+.hk-halka{animation:halka 1.6s ease-out infinite;transform-origin:center;transform-box:fill-box}
+@keyframes halka{from{opacity:.9;transform:scale(.4)}to{opacity:0;transform:scale(1.8)}}
+@media(prefers-reduced-motion:reduce){.hk-pop,.hk-nabiz,.hk-halka{animation:none}}
+@media(max-width:760px){
+ body.hk main{grid-template-rows:1fr}
+ #hk{left:8px;right:8px;bottom:8px;width:auto;padding:12px 14px 10px}#hk h2{font-size:18px}#hk p{font-size:15px}
+ header{gap:8px;padding:0 10px}header h1{font-size:17px}#surum .uz{display:none}@media(max-width:440px){#surum{display:none}}header .hk-btn{padding:6px 10px}
+ main{grid-template-columns:1fr;grid-template-rows:42% 58%}
+ #map{grid-row:1}#panel{grid-row:2;border-right:0;border-top:1px solid var(--line)}
+}
 </style>
 </head>
 <body>
-<aside id="panel">
-  <h1>Çanakkale koruma haritası</h1>
-  <div class="alt">Tescilli yapılar, sitler, üst koruma statüleri, kıyı ve idari sınırlar. Bir öğeye tıklayınca kaydı açılır.</div>
-  <input id="ara" type="search" placeholder="Ada göre ara (ör. Abydos, Nara, şehitlik)">
-  <div id="sonuc"></div>
-  <div class="altlik">
-    <label><input type="radio" name="alt" value="uydu" checked> Uydu (yer adlı)</label>
-    <label><input type="radio" name="alt" value="osm"> Harita</label>
-  </div>
-  <div id="liste"></div>
-</aside>
-<div id="map"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="data.js"></script>
+<header>
+  <h1>Çanakkale Turizm Yönetim Planı</h1>
+  <span class="rozet" id="surum">v0.9</span>
+  <span class="sag"><button class="hk-btn" id="hkBas">Hikâyeyi izle</button></span>
+</header>
+<main>
+  <aside id="panel">
+    <nav class="sek" id="sek">
+      <button data-s="koruma" class="on">Koruma</button>
+      <button data-s="hikaye">Hikâye</button>
+      <button data-s="projeler">Projeler</button>
+      <button data-s="kurumlar">Kurumlar</button>
+      <button data-s="paketler">İş paketleri</button>
+      <button data-s="hakkinda">Hakkında</button>
+    </nav>
+    <div class="ic" id="ic"></div>
+  </aside>
+  <div id="map"></div>
+  <div id="zc" aria-label="Zaman çizgisi"><div class="ust" id="zcUst"></div><div class="iz" id="zcIz" role="slider" tabindex="0" aria-label="Zamanda ilerle"></div><div class="not">Üstteki yuvarlaklar bu topraklarda iz bırakan kişiler: <span style="color:#8A6918">● düşünce ve bilim</span> <span style="color:#00354F">● devlet ve savaş</span> <span style="color:#3D5020">● keşif ve arkeoloji</span>. Her çağa ayrı genişlik verildi; uzunluklar çağ içinde ölçeklidir.</div><div id="zcKart"></div></div>
+  <div id="hk" role="dialog" aria-live="polite"><div class="bol" id="hkBol"></div><div class="yil" id="hkYil"></div><div class="once" id="hkOnce"></div><h2 id="hkBas2"></h2><p id="hkMetin"></p>
+    <div class="ctl"><button class="ik" id="hkGeri" aria-label="Önceki">←</button><button id="hkIleri">İleri →</button><button class="ik" id="hkKapat">Atla</button><span class="nok2" id="hkNok"></span></div></div>
+</main>
+<script src="leaflet.js"></script>
+<script src="koruma.js"></script>
+<script src="projeler.js"></script>
+<script src="altlik.js"></script>
+<script src="hikaye.js"></script>
 <script>
-const map = L.map("map", { preferCanvas: true }).setView([40.08, 26.33], 10);
+{
+const D = window.PLAN, PR = D.projeler, IP = D.ip, KAT = window.KATMANLAR || [];
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const slug = s => s.toLocaleLowerCase("tr").replace(/ç/g,"c").replace(/ğ/g,"g").replace(/ı/g,"i").replace(/ö/g,"o").replace(/ş/g,"s").replace(/ü/g,"u").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+document.getElementById("surum").innerHTML = esc(D.surum.split(" ")[0]) + "<span class='uz'> " + esc(D.surum.split(" ").slice(1).join(" ")) + " · " + esc(D.tarih) + "</span>";
+const STATU = {A:"Başlatılabilir", B:"Hazırlanmalı", C:"Dönüştürücü"};
+const misyonlar = [...new Set(PR.map(p => p.misyon))].sort((a,b) => (parseInt(a)||99) - (parseInt(b)||99));
+const RENK = ["#c8102e","#0e7c86","#e08a00","#5b3fa8","#2f8f3a","#b5446e","#1f5fbf","#8a6d1d","#d0531b","#3d6b74","#7a7a7a"];
+const renk = m => RENK[misyonlar.indexOf(m) % RENK.length];
+const norm = a => a.replace(/\s*\(.*?\)/g,"").trim().replace(/^Belediye$/,"Çanakkale Belediyesi");
+const kurumAd = new Map();
+PR.forEach(p => { kurumAd.set(slug(p.ana), p.ana); p.katki.forEach(k => { const n = norm(k); if (n) kurumAd.set(slug(n), n); }); });
+
+/* Harita */
+const map = L.map("map", {preferCanvas:true, zoomControl:true}).setView([40.05, 26.35], 9);
+map.createPane("altlik").style.zIndex = 150;
+map.createPane("proje").style.zIndex = 460;
+/* Altlıklar: uydu (yer adlı), harita, kabartma; hikâye kipi kabartmayla oynar */
 const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/";
-const yerAdi = L.tileLayer(ESRI + "Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, pane: "overlayPane" });
-const alt = {
-  osm: L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }),
-  uydu: L.layerGroup([L.tileLayer(ESRI + "World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Esri, Maxar" }), yerAdi])
-};
-alt.uydu.addTo(map);
-document.querySelectorAll("input[name=alt]").forEach(r => r.onchange = () => {
-  Object.values(alt).forEach(t => map.removeLayer(t)); alt[r.value].addTo(map);
-  document.body.classList.toggle("acik", r.value === "osm");
-});
+const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19, attribution:"© OpenStreetMap"});
+const uydu = L.layerGroup([L.tileLayer(ESRI+"World_Imagery/MapServer/tile/{z}/{y}/{x}", {maxZoom:19, attribution:"Esri, Maxar"}), L.tileLayer(ESRI+"Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {maxZoom:19, pane:"overlayPane"})]);
+const kampanya = L.layerGroup(Object.entries(window.ALTLIK || {}).map(([ad,b]) => L.imageOverlay("altlik_"+ad+".jpg", b, {pane:"altlik", attribution: ad==="ege"?"Kabartma: GEBCO 2024":""})));
+const ALTLIK = {"Uydu (yer adlı)": uydu, "Harita": osm, "Kabartma": kampanya};
+uydu.addTo(map);
+L.control.layers(ALTLIK, null, {position:"topright"}).addTo(map);
+const altlikSimdi = () => Object.values(ALTLIK).find(l => map.hasLayer(l));
+function altlikSec(l){ Object.values(ALTLIK).forEach(x => { if (x !== l) map.removeLayer(x); }); l.addTo(map); document.body.classList.toggle("acik", l !== uydu); }
+map.on("baselayerchange", e => document.body.classList.toggle("acik", e.layer !== uydu));
 
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-function popup(k, p) {
+/* Koruma katmanları (webgis_veri.py → koruma.js): kayıt açılır, ad etiketleri yakınlaştıkça çıkar */
+function popup(k, p){
   const ad = p.ad || p.label_text || p.name || p.ADI || p.mahalle || k.ad;
-  const satir = Object.entries(p).filter(([a]) => a !== "ad").map(([a, v]) => `<tr><td>${esc(a)}</td><td>${esc(v)}</td></tr>`).join("");
-  return `<b>${esc(ad)}</b><div style="color:#6b675f;margin-bottom:4px">${esc(k.grup)} · ${esc(k.ad)}</div><table>${satir}</table>`;
+  const sat = Object.entries(p).filter(([a]) => a !== "ad").map(([a,v]) => `<tr><td>${esc(a)}</td><td>${esc(v)}</td></tr>`).join("");
+  return `<b>${esc(ad)}</b><div style="color:#475459;margin-bottom:4px">${esc(k.grup)} · ${esc(k.ad)}</div><table>${sat}</table>`;
 }
-
-const katman = [], aranan = [], etiketler = [];
-const sira = [...new Set(KATMANLAR.map(k => k.grup))];
-const liste = document.getElementById("liste");
-const ust = ["Üst koruma", "İdari sınırlar"];  // geniş alanlar altta çizilsin
-const paneSira = g => ust.includes(g) ? 410 : g.startsWith("Sitler") ? 420 : g === "Kıyı" ? 440 : g === "Proje" ? 450 : 430;
-
-KATMANLAR.forEach((k, i) => {
-  const pn = "p" + paneSira(k.grup);
-  if (!map.getPane(pn)) { map.createPane(pn).style.zIndex = paneSira(k.grup); }
-  const st = { pane: pn, color: k.renk, weight: k.grup === "Kıyı" ? 3.5 : k.cizgi ? 2.2 : 1, opacity: .95, fillColor: k.renk, fillOpacity: k.cizgi ? 0 : (ust.includes(k.grup) ? .12 : .35), dashArray: k.kesik ? "6 5" : null };
-  const lyr = L.geoJSON(k.veri, {
-    pane: pn, style: () => st,
-    pointToLayer: (f, ll) => L.circleMarker(ll, { pane: pn, radius: k.grup === "Proje" ? 7 : 5, color: "#222", weight: 1, fillColor: k.renk, fillOpacity: .95 }),
-    onEachFeature: (f, l) => {
-      l.bindPopup(() => popup(k, f.properties || {}));
-      const p = f.properties || {}; const ad = p.ad || p.label_text || p.name || p.ADI || p.mahalle || "";
-      const etiket = etiketMetni(k, p);
-      l.bindTooltip(`${esc(etiket)}<br><span style="opacity:.75">${esc(k.ad)}</span>`, { sticky: true });
-      if (ad) aranan.push({ ad: String(ad), alt: k.ad, l });
-      if (etiket && !k.cizgi) etiketler.push({ k, i, l, metin: etiket });
-    }
-  });
-  katman[i] = lyr; if (k.acik) lyr.addTo(map);
-});
-
-// Kalıcı ad etiketleri: yakınlaştıkça görünür (öncelikli katmanlar daha erken)
-function etiketMetni(k, p) {
+function etiketMetni(k, p){
   const ad = p.ad || p.label_text || p.name || p.ADI || "";
   const genel = /^(\d\.?\s*)?(derece\s*)?(arkeoloji̇?k|ark\.?)\s*sit( alanı)?$|^\d\.\s*arkeoloji̇?k sit alanı$|^mevcut$/i;
   if (ad && !genel.test(ad.trim())) return ad;
   if (p.envanter_no) return `${k.ad} (${p.envanter_no})`;
   return ad;
 }
-const esik = k => k.grup === "Proje" ? 9 : /tabya|Askerî/.test(k.ad) ? 11 : k.grup.startsWith("Tescilli") ? 14 : k.grup === "Üst koruma" ? 9 : 12;
-const etiketKatmani = L.layerGroup().addTo(map);
-function etiketleriCiz() {
-  etiketKatmani.clearLayers();
+const UST = ["Üst koruma", "İdari sınırlar"];
+const paneSira = g => UST.includes(g) ? 410 : g.startsWith("Sitler") ? 420 : g === "Kıyı" ? 440 : g === "Proje" ? 450 : 430;
+const aranan = [], etiketler = [];
+const katman = KAT.map((k,i) => {
+  const pn = "p" + paneSira(k.grup);
+  if (!map.getPane(pn)) map.createPane(pn).style.zIndex = paneSira(k.grup);
+  const st = {pane:pn, color:k.renk, weight:k.grup==="Kıyı"?3.5:k.cizgi?2.2:1, opacity:.95, fillColor:k.renk, fillOpacity:k.cizgi?0:(UST.includes(k.grup)?.12:.35), dashArray:k.kesik?"6 5":null};
+  return L.geoJSON(k.veri, {pane:pn, style:() => st,
+    pointToLayer:(f,ll) => L.circleMarker(ll,{pane:pn, radius:k.grup==="Proje"?7:5, color:"#222", weight:1, fillColor:k.renk, fillOpacity:.95}),
+    onEachFeature:(f,l) => { const p=f.properties||{}; const ad=p.ad||p.label_text||p.name||p.ADI||p.mahalle||""; const et=etiketMetni(k,p);
+      l.bindPopup(() => popup(k,p)); l.bindTooltip(`${esc(et||k.ad)}<br><span style="opacity:.75">${esc(k.ad)}</span>`,{sticky:true});
+      if (ad) aranan.push({ad:String(ad), alt:k.ad, i, l}); if (et && !k.cizgi) etiketler.push({k, i, l, metin:et}); }});
+});
+const esik = k => k.grup==="Proje" ? 9 : /tabya|Askerî/.test(k.ad) ? 11 : k.grup.startsWith("Tescilli") ? 14 : k.grup==="Üst koruma" ? 9 : 12;
+const etiketKat = L.layerGroup().addTo(map);
+function etiketleriCiz(){
+  etiketKat.clearLayers(); if (document.body.classList.contains("hk")) return;
   const z = map.getZoom(), b = map.getBounds().pad(0.1);
-  etiketler.forEach(e => {
-    if (z < esik(e.k) || !map.hasLayer(katman[e.i])) return;
-    const c = e.l.getLatLng ? e.l.getLatLng() : e.l.getBounds().getCenter();
-    if (!b.contains(c)) return;
-    etiketKatmani.addLayer(L.marker(c, { interactive: false, icon: L.divIcon({ className: "etk" + (e.k.grup === "Proje" ? " buyuk" : ""), html: esc(e.metin.length > 42 ? e.metin.slice(0, 40) + "…" : e.metin), iconSize: null }) }));
+  etiketler.forEach(e => { if (z < esik(e.k) || !map.hasLayer(katman[e.i])) return;
+    const c = e.l.getLatLng ? e.l.getLatLng() : e.l.getBounds().getCenter(); if (!b.contains(c)) return;
+    etiketKat.addLayer(L.marker(c,{interactive:false, icon:L.divIcon({className:"etk", html:esc(e.metin.length>42 ? e.metin.slice(0,40)+"…" : e.metin), iconSize:null})})); });
+}
+map.on("zoomend moveend", etiketleriCiz);
+/* Koruma kipinde kullanıcının seçtiği katmanlar; plan sekmelerinde yalnız sınır ve kıyı */
+const korumaAcik = new Set(KAT.map((k,i) => k.acik ? i : -1).filter(i => i >= 0));
+const PLAN_ADLAR = ["İlçe sınırları", "Kıyı kenar çizgisi (2022 UİP)", "İl kıyısı (ilçe sınırından)"];
+const planAcik = new Set(KAT.map((k,i) => PLAN_ADLAR.includes(k.ad) ? i : -1).filter(i => i >= 0));
+let projeGoster = false;
+
+const projeKat = L.featureGroup().addTo(map); const izler = new Map();
+function katmanUygula(){
+  if (document.body.classList.contains("hk")) return;
+  const kor = sekme === "koruma", set = kor ? korumaAcik : planAcik;
+  katman.forEach((l,i) => set.has(i) ? l.addTo(map) : map.removeLayer(l));
+  (!kor || projeGoster) ? projeKat.addTo(map) : map.removeLayer(projeKat);
+  etiketleriCiz();
+}
+function ciz(liste){
+  projeKat.clearLayers(); izler.clear();
+  liste.forEach(p => {
+    if (!p.geom) return;
+    const c = renk(p.misyon), yk = p.konum === "yaklaşık";
+    const lyr = L.geoJSON(p.geom, {pane:"proje",
+      style:{pane:"proje", color:c, weight:p.geom.type.includes("Line")?5:2, fillColor:c, fillOpacity:.25, dashArray:null},
+      pointToLayer:(f,ll) => L.circleMarker(ll,{pane:"proje", radius:yk?7:8,color:yk?c:"#fff",weight:yk?2:2,dashArray:yk?"3 3":null,fillColor:c,fillOpacity:yk?.35:.95})
+    });
+    lyr.bindTooltip("<b>"+esc(p.kod)+"</b> "+esc(p.ad)+"<br><span style='opacity:.7'>"+esc(p.ana)+" · "+esc(p.donem)+(yk?" · yaklaşık konum":"")+"</span>",{sticky:true});
+    lyr.on("click", () => { location.hash = "proje-" + slug(p.kod); });
+    lyr.addTo(projeKat); izler.set(p.kod, lyr);
   });
 }
-map.on("zoomend moveend overlayadd overlayremove", etiketleriCiz);
-setTimeout(etiketleriCiz, 300);
 
-sira.forEach(g => {
-  const d = document.createElement("div"); d.className = "grup";
-  const idx = KATMANLAR.map((k, i) => [k, i]).filter(([k]) => k.grup === g);
-  d.innerHTML = `<label><input type="checkbox" class="gc"> ${esc(g)}</label>` + idx.map(([k, i]) => {
-    const cls = k.kesik ? "sw kz" : k.cizgi ? "sw cz" : "sw";
-    const stl = k.kesik ? `border-top-color:${k.renk}` : `background:${k.renk}`;
-    return `<label class="kat"><input type="checkbox" data-i="${i}" ${k.acik ? "checked" : ""}><span class="${cls}" style="${stl}"></span>${esc(k.ad)}<span class="n">${k.veri.features.length}</span></label>`;
-  }).join("");
-  liste.appendChild(d);
-  const gc = d.querySelector(".gc"), kc = [...d.querySelectorAll("input[data-i]")];
-  const sync = () => { gc.checked = kc.every(c => c.checked); gc.indeterminate = !gc.checked && kc.some(c => c.checked); };
-  kc.forEach(c => c.onchange = () => { const l = katman[c.dataset.i]; c.checked ? l.addTo(map) : map.removeLayer(l); sync(); });
-  gc.onchange = () => { kc.forEach(c => { c.checked = gc.checked; c.onchange(); }); };
-  sync();
-});
+/* Panel */
+const ic = document.getElementById("ic");
+let sekme = "koruma", suz = {q:"", m:"", k:"", d:""};
+function sekmeSec(s){ sekme = s; document.querySelectorAll("#sek button").forEach(b => b.classList.toggle("on", b.dataset.s === s)); katmanUygula(); }
+document.querySelectorAll("#sek button").forEach(b => b.onclick = () => { location.hash = b.dataset.s; });
 
-const sonuc = document.getElementById("sonuc");
-document.getElementById("ara").oninput = e => {
-  const q = e.target.value.toLocaleLowerCase("tr").trim(); sonuc.innerHTML = "";
-  if (q.length < 2) return;
-  aranan.filter(a => a.ad.toLocaleLowerCase("tr").includes(q)).slice(0, 40).forEach(a => {
-    const d = document.createElement("div"); d.innerHTML = `${esc(a.ad)} <span style="color:#6b675f">· ${esc(a.alt)}</span>`;
-    d.onclick = () => {
-      const i = katman.findIndex(l => l.hasLayer(a.l));
-      if (i >= 0 && !map.hasLayer(katman[i])) { katman[i].addTo(map); const c = document.querySelector(`input[data-i="${i}"]`); if (c) { c.checked = true; c.dispatchEvent(new Event("change")); } }
-      a.l.getBounds ? map.fitBounds(a.l.getBounds(), { maxZoom: 16 }) : map.setView(a.l.getLatLng(), 16);
-      a.l.openPopup();
-    };
-    sonuc.appendChild(d);
+function suzulmus(){
+  const q = suz.q.toLocaleLowerCase("tr");
+  return PR.filter(p => (!suz.m || p.misyon === suz.m) && (!suz.k || slug(p.ana) === suz.k || p.katki.some(x => slug(norm(x)) === suz.k)) && (!suz.d || p.donem === suz.d)
+    && (!q || (p.kod+" "+p.ad+" "+p.metin+" "+p.yer+" "+p.ana).toLocaleLowerCase("tr").includes(q)));
+}
+const satir = p => `<li data-k="${esc(p.kod)}"><span class="nok" style="background:${renk(p.misyon)}"></span><div><div class="k">${esc(p.kod)} · ${esc(p.ana)} · ${esc(p.donem)}</div><div class="a">${esc(p.ad)}</div></div></li>`;
+function listeBagla(){ ic.querySelectorAll(".pl li").forEach(li => li.onclick = () => { location.hash = "proje-" + slug(li.dataset.k); }); }
+
+function projeler(){
+  sekmeSec("projeler");
+  const donemler = [...new Set(PR.map(p => p.donem))].sort();
+  const kurumlar = [...new Set(PR.map(p => p.ana))].sort((a,b) => a.localeCompare(b,"tr"));
+  ic.innerHTML = `<input type="search" id="q" placeholder="Proje, yer ya da kurum ara (ör. tabya, Troya, kordon)" value="${esc(suz.q)}">
+  <div class="suz">
+    <select id="fm"><option value="">Tüm misyonlar</option>${misyonlar.map(m => `<option ${m===suz.m?"selected":""}>${esc(m)}</option>`).join("")}</select>
+    <select id="fk"><option value="">Tüm ana sorumlular</option>${kurumlar.map(k => `<option value="${slug(k)}" ${slug(k)===suz.k?"selected":""}>${esc(k)}</option>`).join("")}</select>
+    <select id="fd" style="grid-column:1/-1"><option value="">Tüm dönemler</option>${donemler.map(d => `<option ${d===suz.d?"selected":""}>${esc(d)}</option>`).join("")}</select>
+  </div><div class="say" id="say"></div><ul class="pl" id="pl"></ul>
+  <p class="uyari">Kesik çerçeveli noktalar yaklaşık konumdur (yer adına göre). Kesin izler: kordon eylemleri, kordon hattı, Kepez–Kumkale kıyısı, tabyalar, kentsel sit ve Troya Millî Parkı.</p>`;
+  const yenile = () => {
+    const l = suzulmus();
+    document.getElementById("say").textContent = `${l.length} proje · ${l.filter(p=>p.geom).length} tanesi haritada · ${l.filter(p=>!p.geom).length} tanesi il geneli`;
+    document.getElementById("pl").innerHTML = l.map(satir).join("") || `<li style="cursor:default"><span></span><div>Bu süzgeçle proje yok. Süzgeçleri temizleyin.</div></li>`;
+    listeBagla(); ciz(l);
+  };
+  document.getElementById("q").oninput = e => { suz.q = e.target.value; yenile(); };
+  document.getElementById("fm").onchange = e => { suz.m = e.target.value; yenile(); };
+  document.getElementById("fk").onchange = e => { suz.k = e.target.value; yenile(); };
+  document.getElementById("fd").onchange = e => { suz.d = e.target.value; yenile(); };
+  yenile();
+}
+
+function proje(kod){
+  const p = PR.find(x => slug(x.kod) === kod); if (!p) return projeler();
+  sekmeSec("projeler"); ciz(PR);
+  const ip = IP.find(i => i.id === p.ip);
+  const ayniK = PR.filter(x => x.ana === p.ana && x.kod !== p.kod).slice(0,8);
+  ic.innerHTML = `<button class="geri" id="geri">← Tüm projeler</button>
+  <div><span class="etiket" style="border-color:${renk(p.misyon)};color:${renk(p.misyon)}">${esc(p.kod)}</span><span class="etiket">${esc(p.tur)}</span>${p.statu?`<span class="etiket">${STATU[p.statu]}</span>`:""}</div>
+  <h2>${esc(p.ad)}</h2>
+  <dl class="kunye">
+    <dt>Nerede</dt><dd>${esc(p.yer)}${p.konum==="yaklaşık"?" <span style='color:var(--mute)'>(haritada yaklaşık konum)</span>":p.konum==="il geneli"?" <span style='color:var(--mute)'>(il geneli)</span>":""}</dd>
+    <dt>Ana sorumlu</dt><dd><span class="lnk" data-kurum="${slug(p.ana)}">${esc(p.ana_tam.replace(/^Belediye\b/,"Çanakkale Belediyesi"))}</span></dd>
+    <dt>Dönem</dt><dd>${esc(p.donem)}</dd>
+    <dt>Aşama</dt><dd>${esc(p.asama)}</dd>
+    <dt>Kaynak durumu</dt><dd>${esc(p.kaynak)}</dd>
+    <dt>Gösterge</dt><dd>${esc(p.gos)||"—"}</dd>
+    <dt>Misyon</dt><dd>${esc(p.misyon)}</dd>
+  </dl>
+  <h3>Proje</h3><p>${esc(p.metin)}</p>
+  ${p.ilk?`<h3>Ana sorumlunun tek başına teslim edeceği</h3><p>${esc(p.ilk)}</p>`:""}
+  ${p.kazanim?`<h3>Herkes üzerine düşeni yaptığında</h3><p>${esc(p.kazanim)}</p>`:""}
+  ${p.katki.length?`<h3>Katkı veren kurumlar</h3><p>${p.katki.map(k=>`<span class="lnk" data-kurum="${slug(norm(k))}">${esc(k)}</span>`).join(", ")}</p>`:""}
+  ${p.fin?`<h3>Finansman</h3><p>${esc(p.fin)}</p>`:""}
+  ${ip?`<h3>Bağlı olduğu iş paketi</h3><p><span class="lnk" data-ip="${esc(ip.id)}">${esc(ip.id)}. ${esc(ip.ad)}</span></p>`:""}
+  <h3>Teknik Rapor</h3><p>${p.refs.length?p.refs.map(r=>`${esc(r[2])}: s. ${esc(r[1])}`).join("<br>"):"Bölüm 10, Tablo 10.2 ve Ek H"}</p>
+  ${ayniK.length?`<h3>${esc(p.ana)}: diğer projeler</h3><ul class="pl">${ayniK.map(satir).join("")}</ul>`:""}
+  <h3>Değişiklik geçmişi</h3><table><tr><th>Sürüm</th><th>Tarih</th><th>Değişiklik</th></tr><tr><td>${esc(D.surum.split(" ")[0])}</td><td>${esc(D.tarih)}</td><td>İlk kayıt</td></tr></table>`;
+  document.getElementById("geri").onclick = () => { location.hash = "projeler"; };
+  baglar(); listeBagla();
+  const lyr = izler.get(p.kod);
+  izler.forEach((l,k) => { if (k !== p.kod) l.eachLayer(x => x.setStyle && x.setStyle({opacity:.25, fillOpacity:.08})); });
+  if (lyr) { lyr.bringToFront(); const b = lyr.getBounds(); if (b.isValid()) map.flyToBounds(b, {maxZoom:14, padding:[40,40], duration:.6}); }
+}
+
+function baglar(){
+  ic.querySelectorAll("[data-kurum]").forEach(e => e.onclick = () => { location.hash = "kurum-" + e.dataset.kurum; });
+  ic.querySelectorAll("[data-ip]").forEach(e => e.onclick = () => { location.hash = "ip-" + e.dataset.ip.replace(/\D/g,""); });
+}
+
+function kurumlar(){
+  sekmeSec("kurumlar"); ciz(PR);
+  const say = [...kurumAd.entries()].map(([s,ad]) => [s, ad, PR.filter(p => slug(p.ana)===s).length, PR.filter(p => p.katki.some(k => slug(norm(k))===s)).length])
+    .filter(r => r[2] + r[3] > 0).sort((a,b) => b[2]-a[2] || b[3]-a[3] || a[1].localeCompare(b[1],"tr"));
+  ic.innerHTML = `<p class="say">Her kurum yalnızca kendi projelerini görür: ana sorumlu olduğu ve katkı verdiği.</p>
+  <table><tr><th>Kurum</th><th style="text-align:right">Ana</th><th style="text-align:right">Katkı</th></tr>
+  ${say.map(r => `<tr><td><span class="lnk" data-kurum="${r[0]}">${esc(r[1])}</span></td><td style="text-align:right">${r[2]}</td><td style="text-align:right">${r[3]}</td></tr>`).join("")}</table>`;
+  baglar();
+}
+
+function kurum(s){
+  sekmeSec("kurumlar");
+  const ad = kurumAd.get(s) || s;
+  const ana = PR.filter(p => slug(p.ana) === s), kat = PR.filter(p => p.katki.some(k => slug(norm(k)) === s));
+  ciz(ana.concat(kat));
+  const grup = d => ana.filter(p => p.donem === d);
+  const donemler = [...new Set(ana.map(p => p.donem))].sort();
+  ic.innerHTML = `<button class="geri" id="geri">← Tüm kurumlar</button><h2>${esc(ad)}</h2>
+  <p class="say">Ana sorumlu olduğu ${ana.length} proje, katkı verdiği ${kat.length} proje. Haritada bu kurumun projeleri gösterilmektedir.</p>
+  ${donemler.map(d => `<h3>Ana sorumlu: ${esc(d)}</h3><ul class="pl">${grup(d).map(satir).join("")}</ul>`).join("")}
+  ${kat.length?`<h3>Katkı verdiği projeler</h3><ul class="pl">${kat.map(satir).join("")}</ul>`:""}`;
+  document.getElementById("geri").onclick = () => { location.hash = "kurumlar"; };
+  listeBagla();
+  if (projeKat.getLayers().length) { const b = projeKat.getBounds(); if (b.isValid()) map.flyToBounds(b,{maxZoom:12,padding:[30,30],duration:.6}); }
+}
+
+function paketler(){
+  sekmeSec("paketler"); ciz(PR);
+  ic.innerHTML = `<p class="say">Planın büyük işleri, her biri ayrı sorumlusu, onay mercii ve sözleşmesi olan iş paketlerine bölünmüştür. Sıra: önce plan ve envanter, sonra proje, sonra yapım.</p>
+  <ul class="pl">${IP.map(i => `<li data-ip="${esc(i.id)}"><span class="nok" style="background:var(--sea)"></span><div><div class="k">${esc(i.id)} · ${esc(i.ana)} · ${esc(i.donem)}</div><div class="a">${esc(i.ad)}</div></div></li>`).join("")}</ul>`;
+  ic.querySelectorAll("li[data-ip]").forEach(li => li.onclick = () => { location.hash = "ip-" + li.dataset.ip.replace(/\D/g,""); });
+}
+function paket(n){
+  sekmeSec("paketler");
+  const i = IP.find(x => x.id.replace(/\D/g,"") === n); if (!i) return paketler();
+  const bagli = PR.filter(p => i.kodlar.includes(p.kod)); ciz(bagli.length?bagli:PR);
+  ic.innerHTML = `<button class="geri" id="geri">← Tüm iş paketleri</button><span class="etiket">${esc(i.id)}</span><h2>${esc(i.ad)}</h2>
+  <dl class="kunye"><dt>Ana sorumlu</dt><dd>${esc(i.ana)}</dd><dt>Onay mercii</dt><dd>${esc(i.onay)}</dd><dt>Önce tamamlanmalı</dt><dd>${esc(i.once)}</dd><dt>Dönem</dt><dd>${esc(i.donem)}</dd></dl>
+  <h3>Sözleşme paketleri</h3><p>${esc(i.paket)}</p>
+  ${bagli.length?`<h3>Bağlı projeler</h3><ul class="pl">${bagli.map(satir).join("")}</ul>`:""}`;
+  document.getElementById("geri").onclick = () => { location.hash = "paketler"; };
+  listeBagla();
+  if (bagli.length && projeKat.getLayers().length) { const b = projeKat.getBounds(); if (b.isValid()) map.flyToBounds(b,{maxZoom:13,padding:[30,30],duration:.6}); }
+}
+
+function koruma(){
+  sekmeSec("koruma"); ciz(PR);
+  const gruplar = [...new Set(KAT.map(k => k.grup))];
+  ic.innerHTML = `<h2>Koruma haritası</h2>
+  <p class="say">Tescilli yapılar, sitler, üst koruma statüleri, kıyı ve idari sınırlar. Bir öğeye tıklayınca kaydı açılır. Altlığı haritanın sağ üstünden değiştirebilirsiniz.</p>
+  <input type="search" id="ara" placeholder="Ada göre ara (ör. Abydos, Nara, şehitlik)"><div id="sonuc"></div>
+  <label class="ayar"><input type="checkbox" id="prj" ${projeGoster?"checked":""}> Planın projelerini de göster</label>
+  <div id="liste">${gruplar.map(g => { const idx = KAT.map((k,i) => [k,i]).filter(([k]) => k.grup===g);
+    return `<div class="grup"><label><input type="checkbox" class="gc"> ${esc(g)}</label><div class="kat">${idx.map(([k,i]) => {
+      const cls = k.kesik ? "sw kz" : k.cizgi ? "sw cz" : "sw", stl = k.kesik ? `border-top-color:${k.renk}` : `background:${k.renk}`;
+      return `<label><input type="checkbox" data-i="${i}" ${korumaAcik.has(i)?"checked":""}><span class="${cls}" style="${stl}"></span>${esc(k.ad)}<span class="n">${k.veri.features.length}</span></label>`; }).join("")}</div></div>`; }).join("")}</div>
+  <p class="uyari">50 m ve 100 m hatları 2022 UİP kıyı kenar çizgisinden yükseklik verisiyle hesaplanmıştır; resmî değildir. Konumu olmayan envanter kayıtları yalnız aramada çıkar.</p>`;
+  const sec = (i, acik) => { acik ? korumaAcik.add(i) : korumaAcik.delete(i); acik ? katman[i].addTo(map) : map.removeLayer(katman[i]); etiketleriCiz(); };
+  ic.querySelectorAll(".grup").forEach(d => {
+    const gc = d.querySelector(".gc"), kc = [...d.querySelectorAll("input[data-i]")];
+    const sync = () => { gc.checked = kc.every(c => c.checked); gc.indeterminate = !gc.checked && kc.some(c => c.checked); };
+    kc.forEach(c => c.onchange = () => { sec(+c.dataset.i, c.checked); sync(); });
+    gc.onchange = () => { kc.forEach(c => { c.checked = gc.checked; sec(+c.dataset.i, c.checked); }); sync(); };
+    sync();
   });
-  (window.KONUMSUZ || []).filter(r => r.ad.toLocaleLowerCase("tr").includes(q)).slice(0, 25).forEach(r => {
-    const d = document.createElement("div");
-    d.innerHTML = `${esc(r.ad)} <span style="color:#a0522d">· konumu yok</span>`;
-    d.onclick = () => {
-      const satir = Object.entries(r).filter(([a]) => a !== "ad").map(([a, v]) => `<tr><td>${esc(a)}</td><td>${esc(v)}</td></tr>`).join("");
-      L.popup({ maxWidth: 320 }).setLatLng(map.getCenter())
-        .setContent(`<b>${esc(r.ad)}</b><div style="color:#a0522d;margin-bottom:4px">2023 envanteri · haritada konumu yok</div><table>${satir}</table>`).openOn(map);
-    };
-    sonuc.appendChild(d);
-  });
+  document.getElementById("prj").onchange = e => { projeGoster = e.target.checked; katmanUygula(); };
+  const sonuc = document.getElementById("sonuc");
+  document.getElementById("ara").oninput = e => {
+    const q = e.target.value.toLocaleLowerCase("tr").trim(); sonuc.innerHTML = ""; if (q.length < 2) return;
+    aranan.filter(a => a.ad.toLocaleLowerCase("tr").includes(q)).slice(0,40).forEach(a => {
+      const d = document.createElement("div"); d.innerHTML = `${esc(a.ad)} <span style="color:var(--mute)">· ${esc(a.alt)}</span>`;
+      d.onclick = () => { if (!korumaAcik.has(a.i)) { sec(a.i, true); const c = ic.querySelector(`input[data-i="${a.i}"]`); if (c) { c.checked = true; c.dispatchEvent(new Event("change")); } }
+        a.l.getBounds ? map.fitBounds(a.l.getBounds(), {maxZoom:16}) : map.setView(a.l.getLatLng(), 16); a.l.openPopup(); };
+      sonuc.appendChild(d); });
+    (window.KONUMSUZ || []).filter(r => r.ad.toLocaleLowerCase("tr").includes(q)).slice(0,25).forEach(r => {
+      const d = document.createElement("div"); d.innerHTML = `${esc(r.ad)} <span class="ky">· konumu yok</span>`;
+      d.onclick = () => { const sat = Object.entries(r).filter(([a]) => a !== "ad").map(([a,v]) => `<tr><td>${esc(a)}</td><td>${esc(v)}</td></tr>`).join("");
+        L.popup({maxWidth:320}).setLatLng(map.getCenter()).setContent(`<b>${esc(r.ad)}</b><div style="color:#8A6918;margin-bottom:4px">2023 envanteri · haritada konumu yok</div><table>${sat}</table>`).openOn(map); };
+      sonuc.appendChild(d); });
+  };
+}
+
+function hakkinda(){
+  sekmeSec("hakkinda"); ciz(PR);
+  ic.innerHTML = `<h2>${esc(D.surum)}</h2>
+  <p>Bu portal, Çanakkale Turizm Yönetim Planı'nın projelerini tek yerde toplar. Kullanıcı doğrudan projeye gider ve istediği derinliğe iner: harita, proje kartı, proje sayfası ve Teknik Rapor'daki ilgili bölüm.</p>
+  <p>Site üç bölümden oluşur: <b>Koruma</b> (tescilli yapılar, sitler, üst koruma statüleri, kıyı ve idari sınırlar), <b>Hikâye</b> (Boğaz'ın üç bin yılı ve bu topraklarda iz bırakanlar) ve planın <b>Projeler</b>, <b>Kurumlar</b>, <b>İş paketleri</b> sekmeleri.</p>
+  <p class="uyari">Bu sürüm görüş taslağıdır. Kurum görüşleri ve anket işlendikten sonra v1.0 Onay Sürümü yayımlanır. Sitede tesis bazında veri, kişisel veri ve ticari sır yer almaz. Yapay zekâ bu çalışmada asistandır: hatırlatır, ölçer, önerir; karar vermez.</p>
+  <h3>Sürüm düzeni</h3>
+  <table><tr><th>Sürüm</th><th>Ne zaman</th></tr>
+  <tr><td>v0.9 Görüş Taslağı</td><td>Şimdi: kurum görüşü ve Valilik ön okuması</td></tr>
+  <tr><td>v1.0 Onay Sürümü</td><td>Anket ve kurum görüşleri işlendikten sonra</td></tr>
+  <tr><td>v1.1, v1.2…</td><td>Yıllık gözden geçirmede küçük değişiklikler</td></tr>
+  <tr><td>v2.0</td><td>2031 ara değerlendirmesi ya da hedef veya misyon değişikliği</td></tr></table>
+  <h3>Değişiklik kaydı</h3>
+  <table><tr><th>Sürüm</th><th>Tarih</th><th>Değişiklik</th></tr><tr><td>v0.9</td><td>${esc(D.tarih)}</td><td>${PR.length} proje ve ${IP.length} iş paketiyle ilk kayıt; Teknik Rapor 291 sayfa</td></tr></table>
+  <h3>Yeni proje nasıl eklenir</h3>
+  <p>Kurum, yeni projeyi ya da güncellemeyi uygulama sekreteryasına (ÇTSO) bildirir. Sekreterya kaydı ekler; her değişiklik tarihi ve gerekçesiyle saklanır. Bir kaydın alanları:</p>
+  <p>${["kod","ad","ana sorumlu (tek kurum)","katkı veren kurumlar","misyon","iş paketi","aşama","dönem","kaynak durumu (bütçede var / teklif edildi / açık)","gösterge","haritadaki konum","belgeler ve kararlar","son güncelleme"].map(x=>`<span class="etiket">${x}</span>`).join("")}</p>`;
+}
+
+/* ---------- Hikâye kipi ---------- */
+const H = window.HIKAYE, AZ = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const svgR = L.svg({padding:.6}); const hkKat = L.layerGroup();
+let hkI = -1, hkJeton = 0, hkRaf = [], hkOnceki = null;
+const SVG = {
+  kale:'<svg width="30" height="30" viewBox="0 0 30 30"><path d="M5 27V12h4V8h3v4h6V8h3v4h4v15z" fill="#5a3e1b" stroke="#f3ead6" stroke-width="1.6"/><path d="M13 27v-6a2 2 0 0 1 4 0v6" fill="#f3ead6"/></svg>',
+  gemi:'<svg width="30" height="22" viewBox="0 0 30 22"><path d="M3 13h24l-4 6H7z" fill="currentColor" stroke="#fff" stroke-width="1.2"/><path d="M15 2v10M15 3l7 7h-7z" stroke="#fff" stroke-width="1.4" fill="#fff"/></svg>',
+  ordu:'<svg width="26" height="28" viewBox="0 0 26 28"><path d="M6 27V3" stroke="#2b2118" stroke-width="2"/><path d="M7 4h15l-4 5 4 5H7z" fill="currentColor" stroke="#fff" stroke-width="1.2"/></svg>',
+  asker:'<svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" stroke="#fff" stroke-width="2"/><path d="M7 13l5-4 5 4" stroke="#fff" stroke-width="2.4" fill="none"/></svg>',
+  ok:'<svg width="22" height="22" viewBox="0 0 22 22"><path d="M11 2l8 16-8-4-8 4z" fill="currentColor" stroke="#fff" stroke-width="1.2"/></svg>',
+  catisma:'<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#c8102e" stroke="#fff" stroke-width="2"/><path d="M9 9l12 12M21 9L9 21" stroke="#fff" stroke-width="3"/></svg>',
+  bayrak:'<svg width="28" height="30" viewBox="0 0 28 30"><path d="M5 29V3" stroke="#2b2118" stroke-width="2"/><path d="M6 4h19v13H6z" fill="#c8102e"/><circle cx="14" cy="10.5" r="4" fill="#fff"/><circle cx="15.4" cy="10.5" r="3.2" fill="#c8102e"/><path d="M19 8.6l.6 1.4 1.5.1-1.2 1 .4 1.5-1.3-.8-1.3.8.4-1.5-1.2-1 1.5-.1z" fill="#fff"/></svg>',
+  mayin:'<svg width="26" height="26" viewBox="0 0 26 26"><g stroke="#111" stroke-width="2"><path d="M13 2v22M2 13h22M5 5l16 16M21 5L5 21"/></g><circle cx="13" cy="13" r="7" fill="#222" stroke="#fff" stroke-width="1.5"/></svg>',
+  patlama:'<svg width="34" height="34" viewBox="0 0 34 34"><path d="M17 1l3 9 9-5-5 9 9 3-9 3 5 9-9-5-3 9-3-9-9 5 5-9-9-3 9-3-5-9 9 5z" fill="#ff8a00" stroke="#ffd58a" stroke-width="1.5"/></svg>'
 };
-setTimeout(() => map.invalidateSize(), 200);
+const ikon = (ad, renk, w=30, h=30) => L.divIcon({className:"hk-ik", html:`<div class="hk-pop" style="color:${renk||"#c8102e"}">${SVG[ad]}</div>`, iconSize:[w,h], iconAnchor:[w/2,h/2]});
+const etiket = (ll, metin, b, yon) => L.marker(ll, {interactive:false, icon:L.divIcon({className:"", html:`<div class="hk-et${b?" b":""}${yon?" "+yon:""}">${esc(metin)}</div>`, iconSize:[0,0]})});
+const bekle = ms => new Promise(r => setTimeout(r, AZ ? 0 : ms));
+function yolUzunluk(y){ const d=[0]; for(let i=1;i<y.length;i++) d.push(d[i-1]+Math.hypot(y[i][0]-y[i-1][0],(y[i][1]-y[i-1][1])*Math.cos(y[i][0]*Math.PI/180))); return d; }
+function yolNokta(y, d, t){ const L0=d.at(-1)*t; let i=1; while(i<d.length-1 && d[i]<L0) i++; const u=d[i]===d[i-1]?0:(L0-d[i-1])/(d[i]-d[i-1]); return [y[i-1][0]+(y[i][0]-y[i-1][0])*u, y[i-1][1]+(y[i][1]-y[i-1][1])*u, i]; }
+function canlan(sure, adim){ return new Promise(res => { if (AZ) { adim(1); return res(); } const j=hkJeton, t0=performance.now(); const f = now => { if (j!==hkJeton) return res(); const t=Math.min(1,(now-t0)/sure); adim(t); if (t<1) hkRaf.push(requestAnimationFrame(f)); else res(); }; hkRaf.push(requestAnimationFrame(f)); }); }
+async function rota(a){
+  const y=a.yol, d=yolUzunluk(y), renk=a.renk||"#c8102e";
+  const cz=L.polyline([y[0]],{renderer:svgR,color:renk,weight:4,opacity:.9,dashArray:a.ikon==="ok"?"6 6":null}).addTo(hkKat);
+  const m=L.marker(y[0],{icon:ikon(a.ikon==="asker"?"asker":a.ikon==="ordu"?"ordu":a.ikon==="ok"?"ok":"gemi",renk),interactive:false}).addTo(hkKat);
+  await canlan(a.sure||2400, t => { const [la,lo,i]=yolNokta(y,d,t); cz.setLatLngs(y.slice(0,i).concat([[la,lo]])); m.setLatLng([la,lo]); });
+  if (a.etiket) etiket([y.at(-1)[0]+.012,y.at(-1)[1]], a.etiket).addTo(hkKat);
+}
+function vurgu(ll, renk){ L.circleMarker(ll,{renderer:svgR,radius:22,color:renk||"#ffd58a",weight:3,fill:false,className:"hk-halka"}).addTo(hkKat); }
+async function eylem(a){
+  const j=hkJeton;
+  if (a.t==="rota") return rota(a);
+  if (a.t==="kale") { L.marker(a.yer,{icon:ikon("kale"),interactive:false}).addTo(hkKat); if (a.ad) etiket(a.yer, a.ad, 0, a.yon||"sag").addTo(hkKat); return bekle(500); }
+  if (a.t==="bayrak") { L.marker([a.yer[0]+.01,a.yer[1]+.01],{icon:ikon("bayrak",null,28,30),interactive:false}).addTo(hkKat); if (a.ad) etiket([a.yer[0]-.014,a.yer[1]], a.ad).addTo(hkKat); return bekle(500); }
+  if (a.t==="etiket") { etiket(a.yer, a.metin, a.buyuk).addTo(hkKat); return bekle(400); }
+  if (a.t==="vurgu") { vurgu(a.yer, a.renk); return bekle(400); }
+  if (a.t==="catisma") { L.marker(a.yer,{icon:ikon("catisma"),interactive:false}).addTo(hkKat); vurgu(a.yer,"#c8102e"); if (a.ad) etiket([a.yer[0]-.03,a.yer[1]], a.ad).addTo(hkKat); return bekle(500); }
+  if (a.t==="mayin") { L.marker(a.yer,{icon:ikon("mayin",null,26,26),interactive:false}).addTo(hkKat); vurgu(a.yer,"#ffd58a"); etiket([a.yer[0]-.012,a.yer[1]],"Erenköy Koyu mayın hattı").addTo(hkKat); return bekle(600); }
+  if (a.t==="patlama") { for (const ll of a.yerler) { if (j!==hkJeton) return; L.marker(ll,{icon:ikon("patlama",null,34,34),interactive:false}).addTo(hkKat); await bekle(450); } return; }
+  if (a.t==="kopru") { const y=a.yol, k=L.polyline([y[0]],{renderer:svgR,color:"#6b4a2b",weight:9,dashArray:"3 5",opacity:.95}).addTo(hkKat); await canlan(2200, t => k.setLatLngs([y[0],[y[0][0]+(y[1][0]-y[0][0])*t, y[0][1]+(y[1][1]-y[0][1])*t]])); etiket([(y[0][0]+y[1][0])/2,(y[0][1]+y[1][1])/2+.03],"gemilerden köprü (yaklaşık)").addTo(hkKat); return; }
+  if (a.t==="kilit") { L.polyline(a.yol,{renderer:svgR,color:"#c8102e",weight:6,dashArray:"10 6",className:"hk-nabiz"}).addTo(hkKat); return bekle(400); }
+  if (a.t==="tabyalar") { for (const [la,lo,ad] of a.yerler) { if (j!==hkJeton) return; L.marker([la,lo],{icon:ikon("kale",null,24,24),interactive:false}).addTo(hkKat); await bekle(180); } const ET={"Kilitbahir Kalesi":["sol",0.002],"Rumeli Mecidiye Tabyası":["sol",-0.004],"Seddülbahir Kalesi":["sol",0],"Çimenlik Kalesi":["sag",0.002],"Anadolu Hamidiye Tabyası":["sag",-0.004],"Orhaniye Tabyası":["sag",0],"Bigalı Kalesi":["sol",0]};
+    a.yerler.filter(x => ET[x[2]]).forEach(([la,lo,ad]) => etiket([la+ET[ad][1],lo], ad, 0, ET[ad][0]).addTo(hkKat)); return; }
+  if (a.t==="kapali") { a.yol.forEach(y => L.polyline(y,{renderer:svgR,color:"#c8102e",weight:6,className:"hk-nabiz"}).addTo(hkKat)); etiket([40.118,26.43],"kıyıda geçiş yok").addTo(hkKat); return bekle(400); }
+  if (a.t==="kordon") { for (const y of a.yol) { const d=yolUzunluk(y), k=L.polyline([y[0]],{renderer:svgR,color:"#0e7c86",weight:7}).addTo(hkKat); await canlan(2200, t => { const [la,lo,i]=yolNokta(y,d,t); k.setLatLngs(y.slice(0,i).concat([[la,lo]])); }); } etiket([40.12,26.43],"kesintisiz kordon").addTo(hkKat); return; }
+  if (a.t==="gemiler") { const y=a.yol, d=yolUzunluk(y), n=6, ms=[...Array(n)].map(()=>L.marker(y[0],{icon:ikon("gemi","#0e7c86"),interactive:false}).addTo(hkKat));
+    L.polyline(y,{renderer:svgR,color:"#0e7c86",weight:2,dashArray:"4 8",opacity:.6}).addTo(hkKat); etiket([40.02,26.12],"yılda ~600 bin kruvaziyer yolcusu (temsilî)").addTo(hkKat);
+    const t0=performance.now(); const f=now => { if (j!==hkJeton) return; ms.forEach((m,i) => { const t=((now-t0)/26000 + i/n) % 1; const [la,lo]=yolNokta(y,d,t); m.setLatLng([la,lo]); }); hkRaf.push(requestAnimationFrame(f)); };
+    if (AZ) ms.forEach((m,i)=>{ const [la,lo]=yolNokta(y,d,i/n); m.setLatLng([la,lo]); }); else hkRaf.push(requestAnimationFrame(f)); return; }
+  if (a.t==="son") { const b=document.createElement("button"); b.className="son"; b.textContent=a.metin; b.onclick=() => { hkKapat(); location.hash="projeler"; }; document.querySelector("#hk .ctl").prepend(b); return; }
+}
+
+const ZBUGUN=2026, ZBAS=-3000, ZSON=2035;
+const ZPAY=[[-3000,-1200,0,16],[-1200,330,16,40],[330,1300,40,52],[1300,1923,52,80],[1923,ZSON,80,100]];
+const zx = y => { const p=ZPAY.find(([a,b]) => y>=a && y<=b) || (y<ZBAS?ZPAY[0]:ZPAY[4]); const [a,b,x0,x1]=p; return x0+(x1-x0)*(Math.min(Math.max(y,a),b)-a)/(b-a); };
+const zyil = y => y<0 ? "MÖ "+(-y).toLocaleString("tr-TR") : y<1000 ? "MS "+y : String(y);
+const zfark = ([a,b]) => { const s=v=>Math.round(v).toLocaleString("tr-TR");
+  if (a>ZBUGUN) return (a-ZBUGUN)+"–"+(b-ZBUGUN)+" yıl sonra";
+  if (a===ZBUGUN&&b===ZBUGUN) return "bugün";
+  const o1=ZBUGUN-a, o2=ZBUGUN-Math.min(b,ZBUGUN), k=Math.round(o1/25);
+  const t = o2>0 && o2!==o1 ? "bugünden "+s(o1)+"–"+s(o2)+" yıl önce" : o2===0 && o1>0 ? s(o1)+" yıl öncesinden bugüne" : "bugünden "+s(o1)+" yıl önce";
+  return t + (k>=2 ? " · yaklaşık "+s(k)+" kuşak" : ""); };
+const ZCAG=[[-3000,-1200,"Tunç Çağı",1],[-1200,330,"Antik çağ"],[330,1300,"Bizans"],[1300,1922,"Beylikler ve Osmanlı"],[1923,ZSON,"Cumhuriyet"]];
+const ZCAPA=[[-2560,"Mısır piramitleri",1],[1,"Takvim başlangıcı",1],[1453,"İstanbul'un fethi",1],[1923,"Cumhuriyet",1],[ZBUGUN,"Bugün",0]];
+
+const KIK={yildiz:'<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>',
+gunes:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+rulo:'<path d="M7 4h11a2 2 0 0 1 0 4H7"/><path d="M7 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h11V8"/><path d="M9 12h6M9 15h6"/>',
+yaprak:'<path d="M5 19C5 10 11 5 20 4c0 9-5 15-14 15z"/><path d="M5 19l8-8"/>',
+atom:'<circle cx="12" cy="12" r="1.5"/><ellipse cx="12" cy="12" rx="9" ry="3.5"/><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(-60 12 12)"/>',
+kova:'<path d="M5 8h14l-2 12H7z"/><path d="M7 8a5 5 0 0 1 10 0"/>',
+sandik:'<rect x="3" y="9" width="18" height="11" rx="1"/><path d="M3 9l2-4h14l2 4M10 13h4"/>',
+kalem:'<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/>',
+harita:'<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',
+tac:'<path d="M3 18h18M4 18l-1-10 5 4 4-7 4 7 5-4-1 10"/>',
+kilic:'<path d="M14.5 3H21v6.5L9 21.5 2.5 15z"/><path d="M5 13l6 6M3 21l3-3"/>',
+kurek:'<path d="M14 3l7 7-4 1-3-3z"/><path d="M14 8L4 18a2 2 0 0 0 3 3l10-10"/>',
+kitap:'<path d="M4 5h7a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4z"/><path d="M20 5h-5a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h5z"/>'};
+const ksvg = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${KIK[k]||KIK.kitap}</svg>`;
+const KS = (H.kisiler||[]);
+const KTUR={dusunce:['#8A6918','Düşünce ve bilim'],devlet:['#00354F','Devlet ve savaş'],kesif:['#3D5020','Keşif ve arkeoloji']};
+const krenk = k => (KTUR[k.tur]||KTUR.dusunce)[0];
+let kisiMarker=null;
+function kisiKumeler(){ const w=(document.getElementById("zcIz")||{}).clientWidth||1200, thr=2400/w; const sirali=KS.map((k,i)=>[zx(k.z[0]),i]).sort((a,b)=>a[0]-b[0]); const g=[];
+  sirali.forEach(([x,i]) => { const son=g[g.length-1]; if (son && x-son.x<thr) son.i.push(i); else g.push({x:x,i:[i]}); });
+  return g; }
+function kisiKart(i){ const k=KS[i], kart=document.getElementById("zcKart");
+  kart.innerHTML=`<div class="bas"><span class="ki" style="background:${krenk(k)}">${ksvg(k.ik)}</span><div><h4>${esc(k.ad)}</h4><div class="alt">${esc(k.tarih)} · ${esc(k.yer)} · ${esc(zfark(k.z))}</div></div></div><p>${esc(k.metin)}</p><div class="kay">Kaynak: ${esc(k.kaynak)}</div><div class="sat"><button id="kGoster">Haritada göster</button>${k.adim && H.adimlar.some(a=>a.baslik===k.adim) ? `<button id="kHikaye">Hikâyede aç</button>` : ""}<button id="kKapat">Kapat</button></div>`;
+  kart.classList.add("ac"); document.querySelectorAll("#zcIz .ks").forEach(b => b.classList.toggle("on", b.dataset.i.split(",").includes(String(i))));
+  document.getElementById("kKapat").onclick = () => { kart.classList.remove("ac"); document.querySelectorAll("#zcIz .ks").forEach(b => b.classList.remove("on")); if (kisiMarker) { map.removeLayer(kisiMarker); kisiMarker=null; } };
+  document.getElementById("kGoster").onclick = () => kisiHarita(i);
+  const kh=document.getElementById("kHikaye"); if (kh) kh.onclick = () => { kart.classList.remove("ac"); if (kisiMarker) { map.removeLayer(kisiMarker); kisiMarker=null; } hkGoster(H.adimlar.findIndex(a=>a.baslik===k.adim)); };
+  kisiHarita(i); }
+function kisiHarita(i){ const k=KS[i]; if (kisiMarker) map.removeLayer(kisiMarker);
+  kisiMarker=L.marker(k.ll,{icon:L.divIcon({className:"",html:`<div class="kisi-ik" style="background:${krenk(k)}">${ksvg(k.ik)}</div>`,iconSize:[30,30],iconAnchor:[15,15]}),title:k.ad}).addTo(map);
+  kisiMarker.bindTooltip(k.ad+" · "+k.yer,{direction:"right",offset:[16,0],permanent:true});
+  const kut=document.getElementById("hk").getBoundingClientRect(), mr=document.getElementById("map").getBoundingClientRect(), zch=document.getElementById("zc").getBoundingClientRect().height+12, dar=mr.width<760;
+  const ofs = !document.body.classList.contains("hk") ? L.point(0,0) : dar ? L.point(0,(kut.height-zch)/2) : L.point(-(kut.width+16)/2, -zch/2);
+  map.flyTo(map.unproject(map.project(k.ll,10).add(ofs),10), 10, {duration: AZ?0:1.2}); }
+function kisiListe(idx){ const kart=document.getElementById("zcKart");
+  kart.innerHTML=`<div class="alt" style="margin-bottom:4px">Bu dönemde bu topraklarda iz bırakanlar</div><ul>${idx.map(i=>`<li data-i="${i}"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${krenk(KS[i])};margin-right:6px"></span><b>${esc(KS[i].ad)}</b> · ${esc(KS[i].tarih)} · ${esc(KS[i].yer)}</li>`).join("")}</ul><div class="sat"><button id="kKapat">Kapat</button></div>`;
+  kart.classList.add("ac"); kart.querySelectorAll("li").forEach(li => li.onclick = () => kisiKart(+li.dataset.i));
+  document.getElementById("kKapat").onclick = () => kart.classList.remove("ac"); }
+function zcKur(){
+  const iz=document.getElementById("zcIz");
+  iz.innerHTML = ZCAG.map(([a,b,ad,t]) => `<div class="cag${t?" t":""}" style="left:${zx(a)}%;width:${zx(b)-zx(a)}%" title="${ad}: ${zyil(a)} – ${zyil(Math.min(b,ZBUGUN))}">${ad}</div>`).join("")
+    + `<div class="hat"></div>`
+    + ZCAPA.map(([y,ad,k]) => `<div class="cpa${k?" k":""}${zx(y)<8?" bas":zx(y)>92?" son":""}" style="left:${zx(y)}%">${ad} · ${zyil(y)}</div>`).join("")
+    + `<div class="aral" id="zcAral"></div>`
+    + H.adimlar.map((s,k) => `<button class="ad" data-k="${k}" style="left:${zx(s.z[0])}%" title="${esc(s.yil)}: ${esc(s.baslik)}" aria-label="${esc(s.yil)}: ${esc(s.baslik)}"></button>`).join("")
+    + `<div class="imle" id="zcImle"></div>`
+    + kisiKumeler().map(c => `<button class="ks" data-i="${c.i.join(",")}" style="left:${c.x}%;color:${new Set(c.i.map(i=>KS[i].tur)).size>1?"#0A1114":krenk(KS[c.i[0]])};border-color:${new Set(c.i.map(i=>KS[i].tur)).size>1?"#0A1114":krenk(KS[c.i[0]])}" title="${c.i.map(i=>esc(KS[i].ad)).join(", ")}" aria-label="Kişiler: ${c.i.map(i=>esc(KS[i].ad)).join(", ")}">${ksvg(KS[c.i[0]].ik)}${c.i.length>1?`<b>${c.i.length}</b>`:""}</button>`).join("");
+  iz.querySelectorAll(".ad").forEach(b => b.onclick = e => { e.stopPropagation(); hkGoster(+b.dataset.k); });
+  iz.querySelectorAll(".ks").forEach(b => { b.onpointerdown = e => e.stopPropagation(); b.onclick = e => { e.stopPropagation(); const ix=b.dataset.i.split(",").map(Number); ix.length>1 ? kisiListe(ix) : kisiKart(ix[0]); }; });
+  const sec = x => { const r=iz.getBoundingClientRect(), p=100*(x-r.left)/r.width; let en=0, ed=1e9;
+    H.adimlar.forEach((s,k) => { const d=Math.abs(zx(s.z[0])-p); if (d<ed-0.01) { ed=d; en=k; } }); return en; };
+  let surukle=false, son=-1;
+  iz.onpointerdown = e => { surukle=true; iz.setPointerCapture(e.pointerId); son=sec(e.clientX); zcIsaretle(son); };
+  iz.onpointermove = e => { if (!surukle) return; const k=sec(e.clientX); if (k!==son) { son=k; zcIsaretle(k); } };
+  iz.onpointerup = e => { if (!surukle) return; surukle=false; if (son>=0 && son!==hkI) hkGoster(son); else zcIsaretle(hkI); };
+  iz.onkeydown = e => { if (e.key==="ArrowRight"||e.key==="ArrowLeft") e.stopPropagation(); if (e.key==="ArrowRight") document.getElementById("hkIleri").click(); if (e.key==="ArrowLeft") document.getElementById("hkGeri").click(); };
+}
+function zcIsaretle(i){
+  const s=H.adimlar[i]; if (!s) return;
+  document.querySelectorAll("#zcIz .ad").forEach(b => b.classList.toggle("on", +b.dataset.k===i));
+  const [a,b]=s.z; document.getElementById("zcImle").style.left = zx(a)+"%";
+  const ar=document.getElementById("zcAral"); ar.style.left=zx(a)+"%"; ar.style.width=(b-a>1 ? zx(b)-zx(a) : 0)+"%";
+  const cag = ZCAG.find(([x,y]) => a>=x && a<y) || ZCAG[ZCAG.length-1];
+  document.getElementById("zcUst").innerHTML = `<b>${esc(s.yil)}</b><span class="on">${esc(zfark(s.z))}</span><span>· ${cag[2]}</span><span class="sira">· ${i+1} / ${H.adimlar.length}</span>`;
+  document.getElementById("zcIz").setAttribute("aria-valuetext", s.yil+", "+zfark(s.z));
+}
+zcKur();
+async function hkGoster(i){
+  const s=H.adimlar[i]; if (!s) return; hkI=i; const j=++hkJeton; hkRaf.forEach(cancelAnimationFrame); hkRaf=[]; hkKat.clearLayers();
+  document.querySelectorAll("#hk .son").forEach(b => b.remove());
+  document.getElementById("hkBol").textContent = (s.b ? "Bölüm " + s.b + " · " : "") + H.bolumler[s.b];
+  document.getElementById("hkYil").textContent = s.yil; document.getElementById("hkOnce").textContent = zfark(s.z); zcIsaretle(i); document.getElementById("hkBas2").textContent = s.baslik; document.getElementById("hkMetin").textContent = s.metin;
+  document.getElementById("hkNok").innerHTML = H.adimlar.map((_,k) => `<i class="${k===i?"on":""}"></i>`).join("");
+  document.getElementById("hkGeri").disabled = i===0; document.getElementById("hkIleri").textContent = i===H.adimlar.length-1 ? "Bitir" : "İleri →";
+  const kut=document.getElementById("hk").getBoundingClientRect(), mr=document.getElementById("map").getBoundingClientRect(), dar=mr.width<760;
+  const zch=document.getElementById("zc").getBoundingClientRect().height+12;
+  const ofs = dar ? L.point(0, (kut.height-zch)/2) : L.point(-(kut.width+16)/2, -zch/2);
+  const merkez = map.unproject(map.project([s.cam[0],s.cam[1]], s.cam[2]).add(ofs), s.cam[2]);
+  try { map.flyTo(merkez, s.cam[2], {duration: AZ?0:1.4}); } catch(e) { map.setView([s.cam[0],s.cam[1]], s.cam[2]); }
+  await bekle(1500); if (j!==hkJeton) return;
+  for (const a of s.a) { if (j!==hkJeton) return; await eylem(a); }
+}
+function hkBaslat(i=0){
+  if (!document.body.classList.contains("hk")) { hkOnceki = altlikSimdi(); altlikSec(kampanya); }
+  document.body.classList.add("hk"); zcKur(); map.invalidateSize(); [projeKat, ...katman].forEach(l => map.removeLayer(l)); etiketKat.clearLayers(); map.closePopup(); hkKat.addTo(map); hkGoster(i);
+}
+function hkKapat(){
+  hkJeton++; hkRaf.forEach(cancelAnimationFrame); hkRaf=[]; hkKat.clearLayers(); map.removeLayer(hkKat);
+  document.body.classList.remove("hk"); if (kisiMarker) { map.removeLayer(kisiMarker); kisiMarker=null; } document.getElementById("zcKart").classList.remove("ac"); altlikSec(hkOnceki || uydu); katmanUygula();
+  try { localStorage.setItem("ctp_hikaye_izlendi","1"); } catch(e) {}
+  setTimeout(() => map.invalidateSize(), 50);
+}
+document.getElementById("hkIleri").onclick = () => hkI < H.adimlar.length-1 ? hkGoster(hkI+1) : (hkKapat(), location.hash="projeler");
+document.getElementById("hkGeri").onclick = () => hkI > 0 && hkGoster(hkI-1);
+document.getElementById("hkKapat").onclick = () => hkKapat();
+document.getElementById("hkBas").onclick = () => hkBaslat(0);
+document.addEventListener("keydown", e => { if (!document.body.classList.contains("hk")) return; if (e.key==="ArrowRight") document.getElementById("hkIleri").click(); if (e.key==="ArrowLeft") document.getElementById("hkGeri").click(); if (e.key==="Escape") hkKapat(); });
+function hikayeListe(){
+  sekmeSec("hikaye"); ciz(PR);
+  ic.innerHTML = `<p class="say">Boğaz'ın üç bin yılı, harita üstünde. İsteyen baştan izler, isteyen istediği bölümü açar.</p>
+  <button class="hk-btn" id="hkBastan" style="margin-bottom:8px">Baştan izle</button>
+  ${H.bolumler.map((b,bi) => `<h3>${bi ? "Bölüm " + bi + ". " : ""}${esc(b)}</h3><ul class="pl">${H.adimlar.map((s,i) => [s,i]).filter(([s]) => s.b===bi).map(([s,i]) => `<li data-hk="${i}"><span class="nok" style="background:#c8102e"></span><div><div class="k">${esc(s.yil)}</div><div class="a">${esc(s.baslik)}</div></div></li>`).join("")}</ul>`).join("")}
+  <h3>Bu topraklarda iz bırakanlar</h3><ul class="pl">${KS.map((k,i)=>[k,i]).sort((a,b)=>a[0].z[0]-b[0].z[0]).map(([k,i]) => `<li data-ki="${i}"><span class="nok" style="background:${krenk(k)}"></span><div><div class="k">${esc(k.tarih)} · ${esc(k.yer)}</div><div class="a">${esc(k.ad)}</div></div></li>`).join("")}</ul>
+  <h3>Kaynaklar</h3><p style="font-size:14px">${H.kaynaklar.map(esc).join("<br>")}</p>
+  <h3>Doğrulanacak ve yaklaşık olanlar</h3><p style="font-size:14px">${H.dogrulanacak.map(esc).join("<br>")}</p>`;
+  document.getElementById("hkBastan").onclick = () => hkBaslat(0);
+  ic.querySelectorAll("li[data-hk]").forEach(li => li.onclick = () => hkBaslat(+li.dataset.hk));
+  ic.querySelectorAll("li[data-ki]").forEach(li => li.onclick = () => { hkBaslat(hkI||0); setTimeout(() => kisiKart(+li.dataset.ki), 1700); });
+}
+
+function yonlendir(){
+  const h = location.hash.slice(1);
+  if (h.startsWith("proje-")) return proje(h.slice(6));
+  if (h.startsWith("kurum-")) return kurum(h.slice(6));
+  if (h.startsWith("ip-")) return paket(h.slice(3));
+  if (h.startsWith("hikaye-")) { hikayeListe(); return hkBaslat(Math.max(0, parseInt(h.slice(7)) - 1 || 0)); }
+  if (h === "hikaye") return hikayeListe();
+  ({projeler, kurumlar, paketler, katmanlar:koruma, hakkinda}[h] || koruma)();
+  ic.scrollTop = 0;
+}
+window.addEventListener("resize", () => { if (document.body.classList.contains("hk")) { zcKur(); zcIsaretle(hkI); } });
+window.addEventListener("hashchange", () => { yonlendir(); document.getElementById("panel").scrollTop = 0; });
+yonlendir();
+let izlendi = false; try { izlendi = !!localStorage.getItem("ctp_hikaye_izlendi"); } catch(e) {}
+if (!izlendi && !location.hash) hkBaslat(0);
+}
 </script>
 </body>
 </html>
