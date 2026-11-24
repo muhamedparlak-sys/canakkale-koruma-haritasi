@@ -26,11 +26,37 @@ header h1{font-family:var(--fh);font-size:22px;font-weight:800;letter-spacing:.0
 header .sag{margin-left:auto;display:flex;gap:8px;align-items:center}
 header .hk-btn{white-space:nowrap;background:transparent;color:#fff;border-color:rgba(255,255,255,.45)}
 header .hk-btn:hover{background:rgba(255,255,255,.12)}
-main{position:absolute;top:56px;bottom:0;left:0;right:0;display:grid;grid-template-columns:400px 1fr}
+main{position:absolute;top:56px;bottom:0;left:0;right:0;display:grid;grid-template-columns:440px 1fr}
+/* Plan paneli (açılış): planın 12 bölümü; bölüm 6 ve 10 büyük, GZFT dört kadran */
+.ilr{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mute);margin:2px 0 14px}
+.ilr .cb{flex:1;height:4px;background:var(--soft);border-radius:2px;overflow:hidden}
+.ilr .cb i{display:block;height:100%;background:var(--tunc);transition:width .4s ease}
+.ilr button{border:0;background:none;font:inherit;color:var(--mute);text-decoration:underline;cursor:pointer;padding:6px 0;min-height:32px}
+.bento{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kt{position:relative;text-align:left;font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px 11px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-height:76px;transition:border-color .15s,transform .15s}
+.kt:hover{border-color:var(--sea);transform:translateY(-1px)}
+.kt .no{font-family:var(--fh);font-weight:800;font-size:13px;color:var(--tunc);letter-spacing:.04em}
+.kt .ad{font-weight:600;font-size:13.5px;line-height:1.25}
+.kt .dg{font-family:var(--fh);font-weight:800;font-size:30px;line-height:1;color:var(--sea);margin-top:6px}
+.kt .al{font-size:12px;color:var(--mute)}
+.kt.b{grid-column:1/-1;background:var(--soft);border-color:transparent}
+.kt.bos{border-style:dashed}
+.kt .ok{position:absolute;top:9px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--tunc);color:#fff;display:none;place-items:center;font-size:12px;font-weight:800}
+.kt.gor .ok{display:grid}
+.kt.gor{border-color:light-dark(#E5DCC3,#3A3220)}
+.gz{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:6px}
+.gz span{font-family:var(--fh);font-weight:800;font-size:12px;text-align:center;padding:3px 0;border-radius:4px;background:var(--soft);color:var(--mute)}
+.altb{list-style:none;margin:0;padding:0}
+.altb li{padding:10px 0;border-bottom:1px solid var(--line)}
+.altb .n{font-family:var(--fh);font-weight:800;color:var(--tunc);margin-right:6px}
+.altb p{margin:4px 0 0;font-size:14px;color:var(--mute)}
+.gbtn{border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:13.5px;font-weight:600;border-radius:99px;padding:6px 12px;min-height:36px;cursor:pointer}
+.gbtn.on{background:var(--tunc);border-color:var(--tunc);color:#fff}
+.bag{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
 #panel{overflow:auto;border-right:1px solid var(--line);display:flex;flex-direction:column}
 #map{height:100%;background:var(--deniz)}
 nav.sek{flex:none;display:flex;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5;overflow-x:auto}
-nav.sek button{flex:1 0 auto;border:0;background:none;font:inherit;font-weight:600;color:var(--mute);padding:12px 12px;min-height:44px;cursor:pointer;border-bottom:3px solid transparent}
+nav.sek button{flex:1 0 auto;border:0;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--mute);padding:12px 8px;min-height:44px;cursor:pointer;border-bottom:3px solid transparent}
 nav.sek button:hover{color:var(--ink)}
 nav.sek button.on{color:var(--sea);border-bottom-color:var(--sea)}
 .ic{flex:none;padding:14px 16px 40px}
@@ -173,12 +199,12 @@ body.hk #panel{display:none}
 <main>
   <aside id="panel">
     <nav class="sek" id="sek">
-      <button data-s="koruma" class="on">Koruma</button>
+      <button data-s="plan" class="on">Plan</button>
+      <button data-s="koruma">Değerler</button>
       <button data-s="hikaye">Hikâye</button>
       <button data-s="projeler">Projeler</button>
       <button data-s="kurumlar">Kurumlar</button>
       <button data-s="paketler">İş paketleri</button>
-      <button data-s="hakkinda">Hakkında</button>
     </nav>
     <div class="ic" id="ic"></div>
   </aside>
@@ -192,6 +218,7 @@ body.hk #panel{display:none}
 <script src="projeler.js"></script>
 <script src="altlik.js"></script>
 <script src="hikaye.js"></script>
+<script src="bolumler.js"></script>
 <script>
 {
 const D = window.PLAN, PR = D.projeler, IP = D.ip, KAT = window.KATMANLAR || [];
@@ -238,22 +265,38 @@ function etiketMetni(k, p){
 const UST = ["Üst koruma", "İdari sınırlar"];
 const paneSira = g => UST.includes(g) ? 410 : g.startsWith("Sitler") ? 420 : g === "Kıyı" ? 440 : g === "Proje" ? 450 : 430;
 const aranan = [], etiketler = [];
+const BUYUK = /^(Büyük proje sahası|Geniş planlama sahası)/;
+/* Görülenler: bölümler ve haritada açılan yerler; yalnız bu tarayıcıda saklanır */
+const GKEY = "ctp_gorulen";
+let GOR = {b:[], y:[]};
+try { GOR = Object.assign(GOR, JSON.parse(localStorage.getItem(GKEY) || "{}")); } catch(e) {}
+const gorKaydet = () => { try { localStorage.setItem(GKEY, JSON.stringify(GOR)); } catch(e) {} };
+const halkaKat = L.layerGroup().addTo(map);
+function halkaCiz(l){
+  const c = l.getLatLng ? l.getLatLng() : l.getBounds().getCenter();
+  L.circleMarker(c, {radius:12, color:"#8A6918", weight:2.5, fill:false, interactive:false, pane:"proje"}).addTo(halkaKat);
+}
+function yerGoruldu(l){ if (GOR.y.includes(l._k)) return; GOR.y.push(l._k); gorKaydet(); halkaCiz(l); }
 const katman = KAT.map((k,i) => {
   const pn = "p" + paneSira(k.grup);
   if (!map.getPane(pn)) map.createPane(pn).style.zIndex = paneSira(k.grup);
   const st = {pane:pn, color:k.renk, weight:k.grup==="Kıyı"?3.5:k.cizgi?2.2:1, opacity:.95, fillColor:k.renk, fillOpacity:k.cizgi?0:(UST.includes(k.grup)?.12:.35), dashArray:k.kesik?"6 5":null};
-  return L.geoJSON(k.veri, {pane:pn, style:() => st,
+  const buyuk = BUYUK.test(k.ad); let fi = 0;   // büyük alanlar tıklamayı yutmasın
+  return L.geoJSON(k.veri, {pane:pn, style:() => st, interactive:!buyuk,
     pointToLayer:(f,ll) => L.circleMarker(ll,{pane:pn, radius:k.grup==="Proje"?7:5, color:"#222", weight:1, fillColor:k.renk, fillOpacity:.95}),
-    onEachFeature:(f,l) => { const p=f.properties||{}; const ad=p.ad||p.label_text||p.name||p.ADI||p.mahalle||""; const et=etiketMetni(k,p);
+    onEachFeature:(f,l) => { l._k = i + ":" + (fi++); if (buyuk) return;
+      if (!["Kıyı","İdari sınırlar","Proje"].includes(k.grup)) l.on("popupopen", () => yerGoruldu(l));
+      const p=f.properties||{}; const ad=p.ad||p.label_text||p.name||p.ADI||p.mahalle||""; const et=etiketMetni(k,p);
       l.bindPopup(() => popup(k,p)); l.bindTooltip(`${esc(et||k.ad)}<br><span style="opacity:.75">${esc(k.ad)}</span>`,{sticky:true});
       if (ad) aranan.push({ad:String(ad), alt:k.ad, i, l}); if (et && !k.cizgi) etiketler.push({k, i, l, metin:et}); }});
 });
+katman.forEach(g => g.eachLayer(l => { if (GOR.y.includes(l._k)) halkaCiz(l); }));
 const esik = k => k.grup==="Proje" ? 9 : /tabya|Askerî/.test(k.ad) ? 11 : k.grup.startsWith("Tescilli") ? 14 : k.grup==="Üst koruma" ? 9 : 12;
 const etiketKat = L.layerGroup().addTo(map);
 function etiketleriCiz(){
   etiketKat.clearLayers(); if (document.body.classList.contains("hk")) return;
   const z = map.getZoom(), b = map.getBounds().pad(0.1);
-  etiketler.forEach(e => { if (z < esik(e.k) || !map.hasLayer(katman[e.i])) return;
+  etiketler.forEach(e => { if (z < esik(e.k) || !map.hasLayer(katman[e.i]) || (solukMu && SOLUK.has(e.i))) return;
     const c = e.l.getLatLng ? e.l.getLatLng() : e.l.getBounds().getCenter(); if (!b.contains(c)) return;
     etiketKat.addLayer(L.marker(c,{interactive:false, icon:L.divIcon({className:"etk", html:esc(e.metin.length>42 ? e.metin.slice(0,40)+"…" : e.metin), iconSize:null})})); });
 }
@@ -265,10 +308,22 @@ const planAcik = new Set(KAT.map((k,i) => PLAN_ADLAR.includes(k.ad) ? i : -1).fi
 let projeGoster = false;
 
 const projeKat = L.featureGroup().addTo(map); const izler = new Map();
+/* Plan kipinde değerler soluk altlık olur; proje sahası ve projeler önde */
+const SOLUK = new Set([...korumaAcik].filter(i => !["Kıyı","İdari sınırlar","Proje"].includes(KAT[i].grup)));
+const planSeti = new Set([...planAcik, ...SOLUK, ...KAT.map((k,i) => k.grup==="Proje" && k.acik ? i : -1).filter(i => i >= 0)]);
+const SOLUK_ST = {color:"#8b979c", fillColor:"#8b979c", fillOpacity:.10, opacity:.55, weight:1};
+let solukMu = false;
+function soluk(on){
+  if (on === solukMu) return; solukMu = on;
+  SOLUK.forEach(i => katman[i].eachLayer(l => {
+    if (!l._ilk) l._ilk = {color:l.options.color, fillColor:l.options.fillColor, fillOpacity:l.options.fillOpacity, opacity:l.options.opacity, weight:l.options.weight};
+    l.setStyle(on ? SOLUK_ST : l._ilk); }));
+}
 function katmanUygula(){
   if (document.body.classList.contains("hk")) return;
-  const kor = sekme === "koruma", set = kor ? korumaAcik : planAcik;
+  const kor = sekme === "koruma", pl = sekme === "plan", set = kor ? korumaAcik : pl ? planSeti : planAcik;
   katman.forEach((l,i) => set.has(i) ? l.addTo(map) : map.removeLayer(l));
+  soluk(pl);
   (!kor || projeGoster) ? projeKat.addTo(map) : map.removeLayer(projeKat);
   etiketleriCiz();
 }
@@ -411,7 +466,7 @@ function paket(n){
 function koruma(){
   sekmeSec("koruma"); ciz(PR);
   const gruplar = [...new Set(KAT.map(k => k.grup))];
-  ic.innerHTML = `<h2>Koruma haritası</h2>
+  ic.innerHTML = `<h2>Çanakkale'nin değerleri</h2>
   <p class="say">Tescilli yapılar, sitler, üst koruma statüleri, kıyı ve idari sınırlar. Bir öğeye tıklayınca kaydı açılır. Altlığı haritanın sağ üstünden değiştirebilirsiniz.</p>
   <input type="search" id="ara" placeholder="Ada göre ara (ör. Abydos, Nara, şehitlik)"><div id="sonuc"></div>
   <label class="ayar"><input type="checkbox" id="prj" ${projeGoster?"checked":""}> Planın projelerini de göster</label>
@@ -443,6 +498,72 @@ function koruma(){
         L.popup({maxWidth:320}).setLatLng(map.getCenter()).setContent(`<b>${esc(r.ad)}</b><div style="color:#8A6918;margin-bottom:4px">2023 envanteri · haritada konumu yok</div><table>${sat}</table>`).openOn(map); };
       sonuc.appendChild(d); });
   };
+}
+
+/* ---------- Plan paneli (açılış) ve bölüm görünümü ---------- */
+const BL = window.BOLUMLER || [];
+const BUYUKB = [6, 10];   // planın ağırlığı: mekânsal kurgu ve eylem planı
+let gorZaman = null;
+function sahaGoster(){
+  const i = KAT.findIndex(k => /^Büyük proje sahası \(taslak\)/.test(k.ad));
+  const b = i >= 0 ? katman[i].getBounds() : null;
+  if (b && b.isValid()) map.flyToBounds(b, {padding:[24,24], duration:.6});
+}
+function ilerleme(){
+  const n = GOR.b.filter(x => BL.some(b => b.no === x)).length;
+  return `<div class="ilr"><span>${BL.length} bölümden ${n}'i görüldü</span><span class="cb"><i style="width:${BL.length ? 100*n/BL.length : 0}%"></i></span><button id="sifirla">Sıfırla</button></div>`;
+}
+function sifirlaBagla(sonra){
+  const s = document.getElementById("sifirla"); if (!s) return;
+  s.onclick = () => { GOR = {b:[], y:[]}; gorKaydet(); halkaKat.clearLayers(); sonra(); };
+}
+function gostergeHTML(b){
+  const g = b.gosterge;
+  if (b.no === 10) return `<span class="dg">${PR.length}</span><span class="al">proje · ${IP.length} iş paketi</span>`;
+  if (b.no === 3) return `<span class="al">${g ? esc(g.deger) + ", " + esc(g.alt) : ""}</span><span class="gz"><span>G</span><span>Z</span><span>F</span><span>T</span></span>`;
+  if (g && g.bos) return `<span class="al">${esc(g.alt)}</span>`;
+  if (g) return `<span class="dg">${esc(g.deger)}</span><span class="al">${esc(g.alt)}</span>`;
+  return `<span class="al">${b.alt.length} alt bölüm</span>`;
+}
+function planPanel(){
+  sekmeSec("plan"); ciz(PR); clearTimeout(gorZaman);
+  const sira = [...BL.filter(b => BUYUKB.includes(b.no)), ...BL.filter(b => !BUYUKB.includes(b.no))];
+  ic.innerHTML = `<h2>Yönetim planı</h2>
+  <p class="say">Planın 12 bölümü. Harita planın altlığıdır: proje sahası ve projeler önde, Çanakkale'nin değerleri soluk zeminde.</p>
+  ${ilerleme()}
+  <div class="bento">${sira.map(b => {
+    const cls = ["kt", BUYUKB.includes(b.no) ? "b" : "", b.gosterge && b.gosterge.bos ? "bos" : "", GOR.b.includes(b.no) ? "gor" : ""].join(" ");
+    return `<button class="${cls}" data-b="${b.no}"><span class="ok" aria-hidden="true">✓</span><span class="no">BÖLÜM ${b.no}</span><span class="ad">${esc(b.ad)}</span>${gostergeHTML(b)}</button>`; }).join("")}</div>
+  <p class="say" style="margin-top:16px">Değerlerin kendisi için <span class="lnk" data-h="koruma">Çanakkale'nin değerleri</span> · <span class="lnk" data-h="hakkinda">Hakkında</span></p>
+  <p class="uyari">Rakamlar plan dosyasından ve CBS'ten ölçülür; ölçülmemiş gösterge boş bırakılır. Görülen bölümler ve yerler yalnız bu tarayıcıda saklanır.</p>`;
+  ic.querySelectorAll(".kt").forEach(k => k.onclick = () => { location.hash = "bolum-" + k.dataset.b; });
+  ic.querySelectorAll("[data-h]").forEach(a => a.onclick = () => { location.hash = a.dataset.h; });
+  sifirlaBagla(planPanel);
+  sahaGoster();
+}
+function bolumGoruldu(no, on){
+  GOR.b = GOR.b.filter(x => x !== no); if (on) GOR.b.push(no); gorKaydet();
+  const btn = document.getElementById("gorBtn"); if (btn) { btn.classList.toggle("on", on); btn.textContent = on ? "✓ Görüldü" : "Görüldü olarak işaretle"; }
+}
+const BAG = {2:[["Değerler haritası","koruma"]], 6:[["Projeleri listele","projeler"]], 9:[["Kurumlar","kurumlar"]], 10:[["İş paketleri","paketler"],["Projeler","projeler"]]};
+function bolum(no){
+  const b = BL.find(x => x.no === +no); if (!b) return planPanel();
+  sekmeSec("plan"); ciz(PR); clearTimeout(gorZaman);
+  const on = GOR.b.includes(b.no);
+  ic.innerHTML = `<button class="geri" id="geri">← Plan</button>
+  <div class="no" style="font-family:var(--fh);font-weight:800;color:var(--tunc)">BÖLÜM ${b.no}</div><h2>${esc(b.ad)}</h2>
+  <div class="bag"><button class="gbtn${on?" on":""}" id="gorBtn">${on ? "✓ Görüldü" : "Görüldü olarak işaretle"}</button>${(BAG[b.no]||[]).map(([a,h]) => `<button class="gbtn" data-h="${h}">${esc(a)} →</button>`).join("")}</div>
+  ${b.alt.length ? `<ul class="altb">${b.alt.map(a => `<li><span class="n">${esc(a.no)}</span><b>${esc(a.ad)}</b>${a.ozet ? `<p>${esc(a.ozet)}</p>` : ""}</li>`).join("")}</ul>` : `<p class="say">Bu bölümün içeriği proje ve iş paketi listelerindedir.</p>`}
+  <p class="uyari">Özetler plan dosyasındaki ilk paragraflardan alınmıştır. Bölüm sayfalarının tam içeriği (GZFT, ölçümler, yorum analizleri) sonraki sürümde eklenecek.</p>`;
+  document.getElementById("geri").onclick = () => { location.hash = "plan"; };
+  let elle = false;
+  document.getElementById("gorBtn").onclick = () => { elle = true; clearTimeout(gorZaman); bolumGoruldu(b.no, !GOR.b.includes(b.no)); };
+  ic.querySelectorAll(".bag [data-h]").forEach(a => a.onclick = () => { location.hash = a.dataset.h; });
+  /* Kendiliğinden işaret: bölüm 5 sn açık kalınca ya da sonuna kadar kaydırılınca */
+  gorZaman = setTimeout(() => { if (!elle) bolumGoruldu(b.no, true); }, 5000);
+  const pnl = document.getElementById("panel");
+  pnl.onscroll = () => { if (location.hash === "#bolum-" + b.no && pnl.scrollTop + pnl.clientHeight >= pnl.scrollHeight - 8 && !elle) bolumGoruldu(b.no, true); };
+  if (BUYUKB.includes(b.no)) sahaGoster();
 }
 
 function hakkinda(){
@@ -513,7 +634,7 @@ async function eylem(a){
     L.polyline(y,{renderer:svgR,color:"#0e7c86",weight:2,dashArray:"4 8",opacity:.6}).addTo(hkKat); etiket([40.02,26.12],"yılda ~600 bin kruvaziyer yolcusu (temsilî)").addTo(hkKat);
     const t0=performance.now(); const f=now => { if (j!==hkJeton) return; ms.forEach((m,i) => { const t=((now-t0)/26000 + i/n) % 1; const [la,lo]=yolNokta(y,d,t); m.setLatLng([la,lo]); }); hkRaf.push(requestAnimationFrame(f)); };
     if (AZ) ms.forEach((m,i)=>{ const [la,lo]=yolNokta(y,d,i/n); m.setLatLng([la,lo]); }); else hkRaf.push(requestAnimationFrame(f)); return; }
-  if (a.t==="son") { const b=document.createElement("button"); b.className="son"; b.textContent=a.metin; b.onclick=() => { hkKapat(); location.hash="projeler"; }; document.querySelector("#hk .ctl").prepend(b); return; }
+  if (a.t==="son") { const b=document.createElement("button"); b.className="son"; b.textContent=a.metin; b.onclick=() => { hkKapat(); location.hash="plan"; }; document.querySelector("#hk .ctl").prepend(b); return; }
 }
 
 const ZBUGUN=2026, ZBAS=-3000, ZSON=2035;
@@ -613,15 +734,15 @@ async function hkGoster(i){
 }
 function hkBaslat(i=0){
   if (!document.body.classList.contains("hk")) { hkOnceki = altlikSimdi(); altlikSec(kampanya); }
-  document.body.classList.add("hk"); zcKur(); map.invalidateSize(); [projeKat, ...katman].forEach(l => map.removeLayer(l)); etiketKat.clearLayers(); map.closePopup(); hkKat.addTo(map); hkGoster(i);
+  document.body.classList.add("hk"); zcKur(); map.invalidateSize(); [projeKat, halkaKat, ...katman].forEach(l => map.removeLayer(l)); etiketKat.clearLayers(); map.closePopup(); hkKat.addTo(map); hkGoster(i);
 }
 function hkKapat(){
   hkJeton++; hkRaf.forEach(cancelAnimationFrame); hkRaf=[]; hkKat.clearLayers(); map.removeLayer(hkKat);
-  document.body.classList.remove("hk"); if (kisiMarker) { map.removeLayer(kisiMarker); kisiMarker=null; } document.getElementById("zcKart").classList.remove("ac"); altlikSec(hkOnceki || uydu); katmanUygula();
+  document.body.classList.remove("hk"); if (kisiMarker) { map.removeLayer(kisiMarker); kisiMarker=null; } document.getElementById("zcKart").classList.remove("ac"); altlikSec(hkOnceki || uydu); halkaKat.addTo(map); katmanUygula();
   try { localStorage.setItem("ctp_hikaye_izlendi","1"); } catch(e) {}
   setTimeout(() => map.invalidateSize(), 50);
 }
-document.getElementById("hkIleri").onclick = () => hkI < H.adimlar.length-1 ? hkGoster(hkI+1) : (hkKapat(), location.hash="projeler");
+document.getElementById("hkIleri").onclick = () => hkI < H.adimlar.length-1 ? hkGoster(hkI+1) : (hkKapat(), location.hash="plan");
 document.getElementById("hkGeri").onclick = () => hkI > 0 && hkGoster(hkI-1);
 document.getElementById("hkKapat").onclick = () => hkKapat();
 document.getElementById("hkBas").onclick = () => hkBaslat(0);
@@ -646,14 +767,14 @@ function yonlendir(){
   if (h.startsWith("ip-")) return paket(h.slice(3));
   if (h.startsWith("hikaye-")) { hikayeListe(); return hkBaslat(Math.max(0, parseInt(h.slice(7)) - 1 || 0)); }
   if (h === "hikaye") return hikayeListe();
-  ({projeler, kurumlar, paketler, katmanlar:koruma, hakkinda}[h] || koruma)();
+  if (h.startsWith("bolum-")) return bolum(h.slice(6));
+  ({plan:planPanel, projeler, kurumlar, paketler, koruma, degerler:koruma, katmanlar:koruma, hakkinda}[h] || planPanel)();
   ic.scrollTop = 0;
 }
 window.addEventListener("resize", () => { if (document.body.classList.contains("hk")) { zcKur(); zcIsaretle(hkI); } });
-window.addEventListener("hashchange", () => { yonlendir(); document.getElementById("panel").scrollTop = 0; });
+window.addEventListener("hashchange", () => { if (document.body.classList.contains("hk") && !location.hash.startsWith("#hikaye")) hkKapat(); yonlendir(); document.getElementById("panel").scrollTop = 0; });
 yonlendir();
-let izlendi = false; try { izlendi = !!localStorage.getItem("ctp_hikaye_izlendi"); } catch(e) {}
-if (!izlendi && !location.hash) hkBaslat(0);
+/* Açılış Yönetim Planı panelidir; hikâye yalnız istenince başlar (kullanıcı kararı, 24.11.2026) */
 }
 </script>
 </body>
