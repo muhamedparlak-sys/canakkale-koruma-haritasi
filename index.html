@@ -27,6 +27,7 @@ header .sag{margin-left:auto;display:flex;gap:8px;align-items:center}
 header .hk-btn{white-space:nowrap;background:transparent;color:#fff;border-color:rgba(255,255,255,.45)}
 header .hk-btn:hover{background:rgba(255,255,255,.12)}
 main{position:absolute;top:56px;bottom:0;left:0;right:0;display:grid;grid-template-columns:440px 1fr}
+body.okuma main{grid-template-columns:min(660px,52vw) 1fr}
 /* Plan paneli (açılış): planın 12 bölümü; bölüm 6 ve 10 büyük, GZFT dört kadran */
 .ilr{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mute);margin:2px 0 14px}
 .ilr .cb{flex:1;height:4px;background:var(--soft);border-radius:2px;overflow:hidden}
@@ -53,6 +54,20 @@ main{position:absolute;top:56px;bottom:0;left:0;right:0;display:grid;grid-templa
 .gbtn{border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:13.5px;font-weight:600;border-radius:99px;padding:6px 12px;min-height:36px;cursor:pointer}
 .gbtn.on{background:var(--tunc);border-color:var(--tunc);color:#fff}
 .bag{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.icind{display:flex;flex-direction:column;border-top:1px solid var(--line);margin:12px 0 4px}
+.icind a{display:block;padding:7px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;font-size:14px}
+.icind a:hover{color:var(--sea)}
+.icind .n,.metin h3 .n{font-family:var(--fh);font-weight:800;color:var(--tunc);margin-right:8px}
+.metin{font-size:15px;line-height:1.6}
+.metin h3{font-size:20px;margin:28px 0 8px;scroll-margin-top:56px}
+.metin h4{font-size:16px;margin:20px 0 6px;font-family:var(--fh)}
+.metin h5{font-size:14.5px;margin:16px 0 4px}
+.metin p{margin:0 0 10px}
+.metin ul,.metin ol{padding-left:20px;margin:0 0 10px}.metin li{margin-bottom:6px}
+.metin figure{margin:14px 0}.metin img{width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+.metin figcaption{font-size:13px;margin-top:6px}.metin figcaption .kay,.metin .src{display:block;font-size:12px;color:var(--mute);margin-top:3px}
+.metin .cap{font-size:13.5px;margin:16px 0 6px}
+.metin .tb{overflow-x:auto;margin:0 0 6px}.metin table{font-size:12.5px}.metin th{font-weight:700;background:var(--soft);padding:6px}.metin td{padding:5px 6px}
 #panel{overflow:auto;border-right:1px solid var(--line);display:flex;flex-direction:column}
 #map{height:100%;background:var(--deniz)}
 nav.sek{flex:none;display:flex;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5;overflow-x:auto}
@@ -185,7 +200,7 @@ body.hk #panel{display:none}
  body.hk main{grid-template-rows:1fr}
  #hk{left:8px;right:8px;bottom:8px;width:auto;padding:12px 14px 10px}#hk h2{font-size:18px}#hk p{font-size:15px}
  header{gap:8px;padding:0 10px}header h1{font-size:17px}#surum .uz{display:none}@media(max-width:440px){#surum{display:none}}header .hk-btn{padding:6px 10px}
- main{grid-template-columns:1fr;grid-template-rows:42% 58%}
+ main,body.okuma main{grid-template-columns:1fr;grid-template-rows:42% 58%}
  #map{grid-row:1}#panel{grid-row:2;border-right:0;border-top:1px solid var(--line)}
 }
 </style>
@@ -549,19 +564,24 @@ const BAG = {2:[["Değerler haritası","koruma"]], 6:[["Projeleri listele","proj
 function bolum(no){
   const b = BL.find(x => x.no === +no); if (!b) return planPanel();
   sekmeSec("plan"); ciz(PR); clearTimeout(gorZaman);
-  const on = GOR.b.includes(b.no);
+  const on = GOR.b.includes(b.no), pnl = document.getElementById("panel");
+  let elle = false;
   ic.innerHTML = `<button class="geri" id="geri">← Plan</button>
   <div class="no" style="font-family:var(--fh);font-weight:800;color:var(--tunc)">BÖLÜM ${b.no}</div><h2>${esc(b.ad)}</h2>
   <div class="bag"><button class="gbtn${on?" on":""}" id="gorBtn">${on ? "✓ Görüldü" : "Görüldü olarak işaretle"}</button>${(BAG[b.no]||[]).map(([a,h]) => `<button class="gbtn" data-h="${h}">${esc(a)} →</button>`).join("")}</div>
-  ${b.alt.length ? `<ul class="altb">${b.alt.map(a => `<li><span class="n">${esc(a.no)}</span><b>${esc(a.ad)}</b>${a.ozet ? `<p>${esc(a.ozet)}</p>` : ""}</li>`).join("")}</ul>` : `<p class="say">Bu bölümün içeriği proje ve iş paketi listelerindedir.</p>`}
-  <p class="uyari">Özetler plan dosyasındaki ilk paragraflardan alınmıştır. Bölüm sayfalarının tam içeriği (GZFT, ölçümler, yorum analizleri) sonraki sürümde eklenecek.</p>`;
+  ${b.alt.length ? `<nav class="icind" aria-label="Bölüm içindekiler">${b.alt.map(a => `<a href="#bolum-${b.no}" data-a="a${esc(a.no)}"><span class="n">${esc(a.no)}</span>${esc(a.ad)}</a>`).join("")}</nav>` : ""}
+  <article class="metin" id="metin"><p class="say">Bölüm yükleniyor…</p></article>`;
+  fetch("bolum/" + b.no + ".html").then(r => r.ok ? r.text() : Promise.reject(r.status)).then(h => {
+    if (location.hash !== "#bolum-" + b.no) return;
+    document.getElementById("metin").innerHTML = h;   // bolumler.py üretir; plan.md'den kaçışlı HTML
+    /* Kısa bölüm (kaydırma yok) 5 sn sonra, uzun bölüm sonuna kadar okununca görüldü sayılır */
+    if (pnl.scrollHeight <= pnl.clientHeight + 8) gorZaman = setTimeout(() => { if (!elle) bolumGoruldu(b.no, true); }, 5000);
+  }).catch(() => { const m = document.getElementById("metin"); if (m) m.innerHTML = `<p class="uyari">Bölüm metni yüklenemedi. Sayfayı yenileyin.</p>`; });
+  ic.querySelectorAll(".icind a").forEach(a => a.onclick = e => { e.preventDefault(); const t = document.getElementById(a.dataset.a); if (t) t.scrollIntoView({behavior:"smooth", block:"start"}); });
   document.getElementById("geri").onclick = () => { location.hash = "plan"; };
-  let elle = false;
   document.getElementById("gorBtn").onclick = () => { elle = true; clearTimeout(gorZaman); bolumGoruldu(b.no, !GOR.b.includes(b.no)); };
   ic.querySelectorAll(".bag [data-h]").forEach(a => a.onclick = () => { location.hash = a.dataset.h; });
-  /* Kendiliğinden işaret: bölüm 5 sn açık kalınca ya da sonuna kadar kaydırılınca */
-  gorZaman = setTimeout(() => { if (!elle) bolumGoruldu(b.no, true); }, 5000);
-  const pnl = document.getElementById("panel");
+  /* Kendiliğinden işaret: bkz. metin yüklenince */
   pnl.onscroll = () => { if (location.hash === "#bolum-" + b.no && pnl.scrollTop + pnl.clientHeight >= pnl.scrollHeight - 8 && !elle) bolumGoruldu(b.no, true); };
   if (BUYUKB.includes(b.no)) sahaGoster();
 }
@@ -762,6 +782,8 @@ function hikayeListe(){
 
 function yonlendir(){
   const h = location.hash.slice(1);
+  const okuma = h.startsWith("bolum-");
+  if (okuma !== document.body.classList.contains("okuma")) { document.body.classList.toggle("okuma", okuma); setTimeout(() => map.invalidateSize(), 60); }
   if (h.startsWith("proje-")) return proje(h.slice(6));
   if (h.startsWith("kurum-")) return kurum(h.slice(6));
   if (h.startsWith("ip-")) return paket(h.slice(3));
